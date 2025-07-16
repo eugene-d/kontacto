@@ -243,7 +243,7 @@ class UpcomingBirthdaysCommand(BaseCommand):
         if args:
             try:
                 days = int(args[0])
-                if days < 1:
+                if days < 0:
                     Console.error("Days must be a positive number")
                     return
             except ValueError:
@@ -251,33 +251,34 @@ class UpcomingBirthdaysCommand(BaseCommand):
                 return
 
         repo: ContactRepository = context['contact_repo']
-        contacts = repo.get_upcoming_birthdays(days)
+        contacts = []
+
+        # We iterate over all contacts and select only those whose birthday is exactly in N days
+        for contact in repo.get_all():
+            days_left = contact.days_until_birthday()
+            if days_left is not None and days_left == days:
+                contacts.append(contact)
 
         if not contacts:
-            Console.info(f"No birthdays in the next {days} days")
+            Console.info(f"No contacts with birthdays in exactly {days} day(s).")
             return
 
         # Prepare data for table
         table_data = []
         for contact in contacts:
-            days_until = contact.days_until_birthday()
-            if contact.birthday:
-                age = date.today().year - contact.birthday.year
-                if contact.birthday.month > date.today().month or \
-                   (contact.birthday.month == date.today().month and contact.birthday.day > date.today().day):
-                    age -= 1
-
-                table_data.append([
-                    contact.name,
-                    contact.birthday.strftime("%B %d"),
-                    f"{days_until} days",
-                    f"{age + 1} years"
-                ])
+            age = date.today().year - contact.birthday.year if contact.birthday else "N/A"
+            birthday_str = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
+            table_data.append([
+                contact.name,
+                birthday_str,
+                f"{days} days",
+                f"{age + 1} years" if isinstance(age, int) else "N/A"
+            ])
 
         headers = ["Name", "Birthday", "Days Until", "Turning"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
 
-        Console.info(f"\nUpcoming birthdays in the next {days} days:")
+        Console.info(f"\nBirthdays exactly in {days} days:")
         print(table)
 
 
