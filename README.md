@@ -49,7 +49,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd personal_assistant
+cd kontacto
 ```
 
 2. Install dependencies with Poetry:
