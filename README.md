@@ -69,7 +69,7 @@ poetry install --with dev
 poetry run assistant
 
 # Or activate the virtual environment first
-poetry shell
+source $(poetry env info --path)/bin/activate
 assistant
 
 # Or run directly
