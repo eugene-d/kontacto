@@ -6,7 +6,7 @@
    ```bash
    curl -sSL https://install.python-poetry.org | python3 -
    ```
-   
+
    For detailed installation instructions, see [POETRY_SETUP.md](POETRY_SETUP.md)
 
 2. **Install dependencies:**
@@ -16,7 +16,7 @@
 
 3. **Run the application:**
    ```bash
-   poetry run assistant
+   poetry run kontacto
    ```
 
 That's it! The application should now be running.
@@ -61,4 +61,4 @@ Once the application is running, try these commands:
 
 - Type `help` in the application for all commands
 - Check the README.md for full documentation
-- See TROUBLESHOOTING section in README if you encounter issues 
+- See TROUBLESHOOTING section in README if you encounter issues
