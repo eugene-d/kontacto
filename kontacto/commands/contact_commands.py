@@ -253,14 +253,14 @@ class UpcomingBirthdaysCommand(BaseCommand):
         repo: ContactRepository = context['contact_repo']
         contacts = []
 
-        # We iterate over all contacts and select only those whose birthday is exactly in N days
+        # We iterate over all contacts and select only those whose birthday is in N days
         for contact in repo.get_all():
             days_left = contact.days_until_birthday()
             if days_left is not None and days_left == days:
                 contacts.append(contact)
 
         if not contacts:
-            Console.info(f"No contacts with birthdays in exactly {days} day(s).")
+            Console.info(f"No contacts with birthdays in the next {days} day(s).")
             return
 
         # Prepare data for table
@@ -278,7 +278,7 @@ class UpcomingBirthdaysCommand(BaseCommand):
         headers = ["Name", "Birthday", "Days Until", "Turning"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
 
-        Console.info(f"\nBirthdays exactly in {days} days:")
+        Console.info(f"\nBirthdays in the next {days} days:")
         print(table)
 
 
