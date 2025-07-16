@@ -132,10 +132,10 @@ cython_debug/
 # VS Code
 .vscode/
 
-# Personal Assistant specific files
+# Kontacto specific files
 contacts.pkl
 notes.pkl
-.assistant_history
+.kontacto_history
 
 # IDE
 .idea/
@@ -145,4 +145,4 @@ notes.pkl
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db

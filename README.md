@@ -1,6 +1,6 @@
-# Personal Assistant
+# Kontacto
 
-A command-line Personal Assistant application for managing contacts and notes with intelligent command recognition.
+A command-line Kontacto application for managing contacts and notes with intelligent command recognition.
 
 ## Features
 
@@ -66,14 +66,14 @@ poetry install --with dev
 
 ```bash
 # Using Poetry (recommended)
-poetry run assistant
+poetry run kontacto
 
 # Or activate the virtual environment first
 source $(poetry env info --path)/bin/activate
-assistant
+kontacto
 
 # Or run directly
-poetry run python -m personal_assistant.main
+poetry run python -m kontacto.main
 ```
 
 ## Usage
@@ -82,13 +82,13 @@ poetry run python -m personal_assistant.main
 When you start the application, you'll see:
 ```
 ============================
-Welcome to Personal Assistant!
+Welcome to Personal Kontacto!
 ============================
 
 ℹ Type 'help' to see available commands.
 ℹ Use Tab for command completion, arrow keys for history.
 
-assistant>
+kontacto>
 ```
 
 ### Basic Commands
@@ -127,39 +127,39 @@ assistant>
 #### Managing Contacts
 ```bash
 # Add a contact
-assistant> add-contact "John Doe" "123 Main St, New York, NY"
+kontacto> add-contact "John Doe" "123 Main St, New York, NY"
 
 # Add phone and email to contact
-assistant> edit-contact "John Doe" add-phone "555-1234"
-assistant> edit-contact "John Doe" add-email "john@example.com"
+kontacto> edit-contact "John Doe" add-phone "555-1234"
+kontacto> edit-contact "John Doe" add-email "john@example.com"
 
 # Search for contacts
-assistant> search-contacts john
-assistant> sc 555
+kontacto> search-contacts john
+kontacto> sc 555
 
 # Check upcoming birthdays
-assistant> birthdays 30
+kontacto> birthdays 30
 
 # Generate test data
-assistant> generate-contacts 50
+kontacto> generate-contacts 50
 ```
 
 #### Managing Notes
 ```bash
 # Add a note with tags
-assistant> add-note "Remember to buy milk" shopping urgent
+kontacto> add-note "Remember to buy milk" shopping urgent
 
 # Search notes
-assistant> search-notes milk
-assistant> search-tag urgent
+kontacto> search-notes milk
+kontacto> search-tag urgent
 
 # Edit a note
-assistant> edit-note "buy milk" "Buy milk and bread"
+kontacto> edit-note "buy milk" "Buy milk and bread"
 
 # Manage tags
-assistant> add-tag "project deadline" important
-assistant> list-tags
-assistant> notes-by-tag
+kontacto> add-tag "project deadline" important
+kontacto> list-tags
+kontacto> notes-by-tag
 ```
 
 ### Command Editing Fields
@@ -186,14 +186,14 @@ The application accepts dates in multiple formats:
 1. **Use Tab Completion**: Start typing a command and press Tab to autocomplete
 2. **Command History**: Use arrow keys to navigate through previous commands
 3. **Aliases**: Use short aliases like `ac` instead of `add-contact` for faster input
-4. **Fuzzy Matching**: Even if you misspell a command, the assistant will suggest the closest match
+4. **Fuzzy Matching**: Even if you misspell a command, the kontacto will suggest the closest match
 5. **Multiple Values**: When searching, the query will match any field in contacts or notes
 
 ## Data Storage
 
 - Contacts are stored in `contacts.pkl`
 - Notes are stored in `notes.pkl`
-- Command history is stored in `.assistant_history`
+- Command history is stored in `.kontacto_history`
 
 All files are stored in the project root directory and are automatically created on first use.
 
@@ -209,7 +209,7 @@ The application includes comprehensive error handling:
 
 ### Project Structure
 ```
-personal_assistant/
+kontacto/
 ├── models/           # Data models (Contact, Note)
 ├── commands/         # Command implementations
 ├── repositories/     # Data persistence layer
@@ -234,7 +234,7 @@ poetry run pytest
 poetry run pytest -v
 
 # Run with coverage report
-poetry run pytest --cov=personal_assistant --cov-report=term-missing
+poetry run pytest --cov=kontacto --cov-report=term-missing
 ```
 
 ## Troubleshooting
@@ -245,12 +245,12 @@ poetry run pytest --cov=personal_assistant --cov-report=term-missing
    - Install Poetry following the instructions in the Prerequisites section
    - Make sure Poetry is in your PATH: `export PATH="$HOME/.local/bin:$PATH"`
 
-2. **Command not found: assistant**
-   - Make sure you're using `poetry run assistant`
+2. **Command not found: kontacto**
+   - Make sure you're using `poetry run kontacto`
    - Or activate the Poetry shell first: `poetry shell`
 
 3. **Module not found errors**
-   - Make sure you're in the `personal_assistant` directory
+   - Make sure you're in the `kontacto` directory
    - Run `poetry install` to install all dependencies
    - Use `poetry run` to execute commands in the virtual environment
 
@@ -267,4 +267,4 @@ poetry run pytest --cov=personal_assistant --cov-report=term-missing
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.

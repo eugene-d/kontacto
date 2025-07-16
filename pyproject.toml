@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "kontacto"
 version = "1.0.0"
-description = "A command-line Personal Assistant for managing contacts and notes"
+description = "A command-line assistant for managing contacts and notes"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 packages = [
-    { include = "personal_assistant" }
+    { include = "kontacto" }
 ]
 
 [tool.poetry.dependencies]
@@ -28,4 +28,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-assistant = "personal_assistant.main:main" 
+kontacto = "kontacto.main:main"

@@ -1,1 +1,1 @@
-"""Tests package for Personal Assistant.""" 
+"""Tests package """

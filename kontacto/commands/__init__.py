@@ -1,5 +1,3 @@
-"""Commands package for Personal Assistant."""
-
 from .base_command import BaseCommand, CommandRegistry
 from .contact_commands import (
     AddContactCommand, ListContactsCommand, SearchContactsCommand,
