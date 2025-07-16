@@ -49,7 +49,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd personal_assistant
+cd kontacto
 ```
 
 2. Install dependencies with Poetry:
@@ -69,7 +69,7 @@ poetry install --with dev
 poetry run assistant
 
 # Or activate the virtual environment first
-poetry shell
+source $(poetry env info --path)/bin/activate
 assistant
 
 # Or run directly
