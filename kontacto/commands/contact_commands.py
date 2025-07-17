@@ -266,16 +266,14 @@ class UpcomingBirthdaysCommand(BaseCommand):
         # Prepare data for table
         table_data = []
         for contact in contacts:
-            age = date.today().year - contact.birthday.year if contact.birthday else "N/A"
             birthday_str = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
             table_data.append([
                 contact.name,
                 birthday_str,
                 f"{days} days",
-                f"{age + 1} years" if isinstance(age, int) else "N/A"
             ])
 
-        headers = ["Name", "Birthday", "Days Until", "Turning"]
+        headers = ["Name", "Birthday", "Days Until"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
 
         Console.info(f"\nBirthdays in the next {days} days:")
