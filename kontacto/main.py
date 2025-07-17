@@ -121,11 +121,15 @@ class Kontacto:
                     # Group commands by category
                     contact_commands = []
                     note_commands = []
+                    tag_commands = []
                     other_commands = []
 
                     for cmd in commands:
                         if 'contact' in cmd.name:
                             contact_commands.append(cmd)
+                        elif cmd.name in [
+                            'add-tag', 'remove-tag', 'list-tags', 'notes-by-tag', 'clean-tags']:
+                            tag_commands.append(cmd)
                         elif 'note' in cmd.name or 'tag' in cmd.name:
                             note_commands.append(cmd)
                         else:
@@ -141,6 +145,12 @@ class Kontacto:
                     if note_commands:
                         print("\nNote Commands:")
                         for cmd in sorted(note_commands, key=lambda x: x.name):
+                            aliases = f" ({', '.join(cmd.aliases)})" if cmd.aliases else ""
+                            print(f"  {cmd.name:<20} {cmd.description}{aliases}")
+
+                    if tag_commands:
+                        print("\nTag Commands:")
+                        for cmd in sorted(tag_commands, key=lambda x: x.name):
                             aliases = f" ({', '.join(cmd.aliases)})" if cmd.aliases else ""
                             print(f"  {cmd.name:<20} {cmd.description}{aliases}")
 
