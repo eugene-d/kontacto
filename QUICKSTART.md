@@ -7,7 +7,7 @@
    curl -sSL https://install.python-poetry.org | python3 -
    ```
 
-   For detailed installation instructions, see [POETRY_SETUP.md](POETRY_SETUP.md)
+   For detailed installation instructions, see [Poetry's official documentation](https://python-poetry.org/docs/#installing-with-the-official-installer)
 
 2. **Install dependencies:**
    ```bash
