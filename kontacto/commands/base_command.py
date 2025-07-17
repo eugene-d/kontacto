@@ -1,7 +1,7 @@
 """Base command class for the Command Pattern."""
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import Any, Optional
 
 
 class BaseCommand(ABC):
@@ -10,13 +10,13 @@ class BaseCommand(ABC):
     def __init__(self):
         """Initialize the command."""
         self.name: str = ""
-        self.aliases: List[str] = []
+        self.aliases: list[str] = []
         self.description: str = ""
         self.usage: str = ""
-        self.examples: List[str] = []
+        self.examples: list[str] = []
     
     @abstractmethod
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         """
         Execute the command.
         
@@ -26,7 +26,7 @@ class BaseCommand(ABC):
         """
         pass
     
-    def validate_args(self, args: List[str]) -> bool:
+    def validate_args(self, args: list[str]) -> bool:
         """
         Validate command arguments.
         
@@ -77,8 +77,8 @@ class CommandRegistry:
     
     def __init__(self):
         """Initialize the command registry."""
-        self._commands: Dict[str, BaseCommand] = {}
-        self._aliases: Dict[str, str] = {}
+        self._commands: dict[str, BaseCommand] = {}
+        self._aliases: dict[str, str] = {}
     
     def register(self, command: BaseCommand) -> None:
         """
@@ -117,7 +117,7 @@ class CommandRegistry:
         
         return self._commands.get(command_name)
     
-    def get_all_commands(self) -> List[BaseCommand]:
+    def get_all_commands(self) -> list[BaseCommand]:
         """
         Get all registered commands.
         
@@ -126,7 +126,7 @@ class CommandRegistry:
         """
         return list(self._commands.values())
     
-    def get_command_names(self) -> List[str]:
+    def get_command_names(self) -> list[str]:
         """
         Get all command names and aliases.
         

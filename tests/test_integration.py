@@ -1,6 +1,5 @@
 import pytest
-from unittest.mock import patch, Mock
-from datetime import date, timedelta
+from unittest.mock import patch
 
 from kontacto.main import Kontacto
 

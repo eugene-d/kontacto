@@ -1,9 +1,8 @@
 """Base repository class for data persistence."""
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Generic, TypeVar
+from typing import Optional, Generic, TypeVar
 import pickle
-import os
 from pathlib import Path
 
 T = TypeVar('T')
@@ -39,7 +38,7 @@ class BaseRepository(ABC, Generic[T]):
         pass
     
     @abstractmethod
-    def get_all(self) -> List[T]:
+    def get_all(self) -> list[T]:
         """Get all items from the repository."""
         pass
     
@@ -54,11 +53,11 @@ class BaseRepository(ABC, Generic[T]):
         pass
     
     @abstractmethod
-    def search(self, query: str) -> List[T]:
+    def search(self, query: str) -> list[T]:
         """Search for items matching the query."""
         pass
     
-    def save_data(self, data: List[T]) -> None:
+    def save_data(self, data: list[T]) -> None:
         """
         Save data to file using pickle.
         
@@ -71,7 +70,7 @@ class BaseRepository(ABC, Generic[T]):
         except Exception as e:
             raise IOError(f"Failed to save data: {str(e)}")
     
-    def load_data(self) -> List[T]:
+    def load_data(self) -> list[T]:
         """
         Load data from file using pickle.
         

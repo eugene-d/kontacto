@@ -36,8 +36,7 @@ A command-line Kontacto application for managing contacts and notes with intelli
 
 ### Installing Poetry
 
-If you don't have Poetry installed, see [POETRY_SETUP.md](POETRY_SETUP.md) for detailed installation instructions.
-
+If you don’t have Poetry installed, follow the instructions in [Poetry's official documentation](https://python-poetry.org/docs/#installing-with-the-official-installer).
 Quick install:
 ```bash
 # On macOS/Linux/WSL
@@ -103,7 +102,7 @@ kontacto>
 - `search-contacts <query>` or `sc` - Search contacts by any field
 - `edit-contact <name> <field> <value>` - Edit a contact field
 - `delete-contact <name>` - Delete a contact
-- `birthdays [days]` - Show upcoming birthdays
+- `birthdays <days>` - Show upcoming birthdays
 - `generate-contacts [count]` - Generate random test contacts
 
 #### Note Commands

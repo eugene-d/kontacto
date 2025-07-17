@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import patch, Mock
 
 from kontacto.main import Kontacto, main
-from kontacto.ui.console import Console
 
 
 class TestCLIBehavior:

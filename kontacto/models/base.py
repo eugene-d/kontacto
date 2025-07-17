@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 import uuid
 
 
@@ -20,12 +20,12 @@ class BaseModel(ABC):
         self.modified_at = datetime.now()
     
     @abstractmethod
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert the model to a dictionary representation."""
         pass
     
     @abstractmethod
-    def from_dict(self, data: Dict[str, Any]) -> None:
+    def from_dict(self, data: dict[str, Any]) -> None:
         """Load the model from a dictionary representation."""
         pass
     

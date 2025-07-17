@@ -1,6 +1,6 @@
 """Note repository for managing note persistence."""
 
-from typing import List, Optional, Dict
+from typing import Optional
 from collections import defaultdict
 from ..models.note import Note
 from .base_repository import BaseRepository
@@ -17,7 +17,7 @@ class NoteRepository(BaseRepository[Note]):
             file_path: Path to the notes data file
         """
         super().__init__(file_path)
-        self._notes: List[Note] = self.load_data()
+        self._notes: list[Note] = self.load_data()
     
     def add(self, note: Note) -> None:
         """
@@ -50,7 +50,7 @@ class NoteRepository(BaseRepository[Note]):
                 return note
         return None
     
-    def get_all(self) -> List[Note]:
+    def get_all(self) -> list[Note]:
         """
         Get all notes.
         
@@ -95,7 +95,7 @@ class NoteRepository(BaseRepository[Note]):
         
         raise ValueError(f"Note with ID {note_id} not found")
     
-    def search(self, query: str) -> List[Note]:
+    def search(self, query: str) -> list[Note]:
         """
         Search for notes matching the query.
         
@@ -111,7 +111,7 @@ class NoteRepository(BaseRepository[Note]):
                 results.append(note)
         return results
     
-    def search_by_tag(self, tag: str) -> List[Note]:
+    def search_by_tag(self, tag: str) -> list[Note]:
         """
         Search for notes with a specific tag.
         
@@ -127,7 +127,7 @@ class NoteRepository(BaseRepository[Note]):
                 results.append(note)
         return results
     
-    def get_all_tags(self) -> List[str]:
+    def get_all_tags(self) -> list[str]:
         """
         Get all unique tags used across all notes.
         
@@ -139,7 +139,7 @@ class NoteRepository(BaseRepository[Note]):
             tags.update(note.tags)
         return sorted(list(tags))
     
-    def get_notes_by_tags(self) -> Dict[str, List[Note]]:
+    def get_notes_by_tags(self) -> dict[str, list[Note]]:
         """
         Get notes grouped by tags.
         
@@ -178,7 +178,7 @@ class NoteRepository(BaseRepository[Note]):
         """
         return len(self.search_by_tag(tag))
     
-    def load_data(self) -> List[Note]:
+    def load_data(self) -> list[Note]:
         """
         Load notes from file.
         

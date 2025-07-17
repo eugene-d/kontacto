@@ -1,7 +1,7 @@
 """Contact model for the Personal Assistant application."""
 
 from datetime import date, datetime
-from typing import List, Dict, Any, Optional
+from typing import Any, Optional
 from ..models.base import BaseModel
 from ..utils.validators import validate_phone, validate_email, validate_birthday, ValidationError
 
@@ -21,8 +21,8 @@ class Contact(BaseModel):
         super().__init__()
         self._name = name
         self._address = address
-        self._phones: List[str] = []
-        self._emails: List[str] = []
+        self._phones: list[str] = []
+        self._emails: list[str] = []
         self._birthday: Optional[date] = None
         
         if birthday:
@@ -53,7 +53,7 @@ class Contact(BaseModel):
         self.update_modified_time()
     
     @property
-    def phones(self) -> List[str]:
+    def phones(self) -> list[str]:
         """Get list of phone numbers."""
         return self._phones.copy()
     
@@ -90,7 +90,7 @@ class Contact(BaseModel):
         self.update_modified_time()
     
     @property
-    def emails(self) -> List[str]:
+    def emails(self) -> list[str]:
         """Get list of email addresses."""
         return self._emails.copy()
     
@@ -197,7 +197,7 @@ class Contact(BaseModel):
         
         return False
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert contact to dictionary representation."""
         return {
             'id': self.id,
@@ -210,7 +210,7 @@ class Contact(BaseModel):
             'modified_at': self.modified_at.isoformat()
         }
     
-    def from_dict(self, data: Dict[str, Any]) -> None:
+    def from_dict(self, data: dict[str, Any]) -> None:
         """Load contact from dictionary representation."""
         self.id = data['id']
         self._name = data['name']

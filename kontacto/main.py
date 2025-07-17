@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Any
+from typing import Any
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import CompleteStyle
@@ -40,7 +40,7 @@ class Kontacto:
 
         self.completer = CommandCompleter(self.command_registry.get_command_names())
 
-        self.context: Dict[str, Any] = {
+        self.context: dict[str, Any] = {
             'contact_repo': self.contact_repo,
             'note_repo': self.note_repo,
             'kontacto': self

@@ -1,5 +1,4 @@
-from typing import List, Dict, Any
-from datetime import date
+from typing import Any
 from tabulate import tabulate
 from faker import Faker
 from ..commands.base_command import BaseCommand
@@ -23,7 +22,7 @@ class AddContactCommand(BaseCommand):
             "ac 'Jane Smith'"
         ]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 1:
             Console.error("Name is required")
             Console.info(self.usage)
@@ -53,7 +52,7 @@ class ListContactsCommand(BaseCommand):
         self.usage = "list-contacts"
         self.examples = ["list-contacts", "lc"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: ContactRepository = context['contact_repo']
         contacts = repo.get_all()
 
@@ -94,7 +93,7 @@ class SearchContactsCommand(BaseCommand):
         self.usage = "search-contacts <query>"
         self.examples = ["search-contacts john", "sc 555-1234"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Search query is required")
             Console.info(self.usage)
@@ -143,7 +142,7 @@ class EditContactCommand(BaseCommand):
             "edit-contact 'Bob' birthday '1990-01-15'"
         ]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 3:
             Console.error("Name, field, and value are required")
             Console.info(self.usage)
@@ -205,7 +204,7 @@ class DeleteContactCommand(BaseCommand):
         self.usage = "delete-contact <name>"
         self.examples = ["delete-contact 'John Doe'", "dc 'Jane Smith'"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Contact name is required")
             Console.info(self.usage)
@@ -234,21 +233,24 @@ class UpcomingBirthdaysCommand(BaseCommand):
         self.name = "birthdays"
         self.aliases = ["bd", "upcoming-birthdays"]
         self.description = "Show upcoming birthdays"
-        self.usage = "birthdays [days]"
+        self.usage = "birthdays <days>"
         self.examples = ["birthdays", "birthdays 30", "bd 7"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
-        days = 7  # Default to 7 days
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
 
-        if args:
-            try:
-                days = int(args[0])
-                if days < 0:
-                    Console.error("Days must be a positive number")
-                    return
-            except ValueError:
-                Console.error("Invalid number of days")
+        if not args:
+            Console.error("You must provide the number of days")
+            Console.info(self.usage)
+            return
+
+        try:
+            days = int(args[0])
+            if days < 0:
+                Console.error("Days must be a positive number")
                 return
+        except ValueError:
+            Console.error("Invalid number of days")
+            return
 
         repo: ContactRepository = context['contact_repo']
         contacts = []
@@ -266,16 +268,14 @@ class UpcomingBirthdaysCommand(BaseCommand):
         # Prepare data for table
         table_data = []
         for contact in contacts:
-            age = date.today().year - contact.birthday.year if contact.birthday else "N/A"
             birthday_str = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
             table_data.append([
                 contact.name,
                 birthday_str,
                 f"{days} days",
-                f"{age + 1} years" if isinstance(age, int) else "N/A"
             ])
 
-        headers = ["Name", "Birthday", "Days Until", "Turning"]
+        headers = ["Name", "Birthday", "Days Until"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
 
         Console.info(f"\nBirthdays in the next {days} days:")
@@ -293,7 +293,7 @@ class GenerateContactsCommand(BaseCommand):
         self.usage = "generate-contacts [count]"
         self.examples = ["generate-contacts", "generate-contacts 50", "gc 100"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         count = 100  # Default to 100 contacts
 
         if args:

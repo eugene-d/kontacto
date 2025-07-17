@@ -1,6 +1,6 @@
 """Note-related commands for the Personal Assistant."""
 
-from typing import List, Dict, Any
+from typing import Any
 from tabulate import tabulate
 from ..commands.base_command import BaseCommand
 from ..models.note import Note
@@ -22,7 +22,7 @@ class AddNoteCommand(BaseCommand):
             "an 'Project deadline next week' work important"
         ]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 1:
             Console.error("Note content is required")
             Console.info(self.usage)
@@ -52,7 +52,7 @@ class ListNotesCommand(BaseCommand):
         self.usage = "list-notes"
         self.examples = ["list-notes", "ln"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: NoteRepository = context['note_repo']
         notes = repo.get_all()
         
@@ -91,7 +91,7 @@ class SearchNotesCommand(BaseCommand):
         self.usage = "search-notes <query>"
         self.examples = ["search-notes shopping", "sn important"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Search query is required")
             Console.info(self.usage)
@@ -134,7 +134,7 @@ class SearchByTagCommand(BaseCommand):
         self.usage = "search-tag <tag>"
         self.examples = ["search-tag work", "st important"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Tag is required")
             Console.info(self.usage)
@@ -180,7 +180,7 @@ class EditNoteCommand(BaseCommand):
             "en 'project deadline' 'Project deadline moved to Friday'"
         ]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 2:
             Console.error("Search query and new content are required")
             Console.info(self.usage)
@@ -239,7 +239,7 @@ class AddTagCommand(BaseCommand):
         self.usage = "add-tag <search-query> <tag>"
         self.examples = ["add-tag 'buy milk' urgent", "at 'project' important"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 2:
             Console.error("Search query and tag are required")
             Console.info(self.usage)
@@ -279,7 +279,7 @@ class RemoveTagCommand(BaseCommand):
         self.usage = "remove-tag <search-query> <tag>"
         self.examples = ["remove-tag 'buy milk' urgent", "rt 'project' old"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 2:
             Console.error("Search query and tag are required")
             Console.info(self.usage)
@@ -319,7 +319,7 @@ class DeleteNoteCommand(BaseCommand):
         self.usage = "delete-note <search-query>"
         self.examples = ["delete-note 'old reminder'", "dn 'temporary note'"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Search query is required")
             Console.info(self.usage)
@@ -381,7 +381,7 @@ class ListTagsCommand(BaseCommand):
         self.usage = "list-tags"
         self.examples = ["list-tags", "lt"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: NoteRepository = context['note_repo']
         tags = repo.get_all_tags()
         
@@ -413,7 +413,7 @@ class NotesByTagCommand(BaseCommand):
         self.usage = "notes-by-tag"
         self.examples = ["notes-by-tag", "nbt"]
     
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: NoteRepository = context['note_repo']
         grouped = repo.get_notes_by_tags()
         
