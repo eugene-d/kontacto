@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from tabulate import tabulate
 from faker import Faker
@@ -16,9 +17,9 @@ class AddContactCommand(BaseCommand):
         self.name = "add-contact"
         self.aliases = ["ac", "new-contact"]
         self.description = "Add a new contact"
-        self.usage = "add-contact <name> [address]"
+        self.usage = "add-contact <name> [address][email][phone][birthday]"
         self.examples = [
-            "add-contact 'John Doe' '123 Main St, City'",
+            "add-contact 'John' '123 Main St' 'john@example.com' '0501234567' '15.04.1990'",
             "ac 'Jane Smith'"
         ]
 
@@ -29,9 +30,34 @@ class AddContactCommand(BaseCommand):
             return
 
         name = args[0]
-        address = " ".join(args[1:]) if len(args) > 1 else ""
+        address_parts = []
+        emails = []
+        phones = []
+        birthday = None
 
-        contact = Contact(name=name, address=address)
+        for value in args[1:]:
+            try:
+                parsed_date = datetime.strptime(value, "%d.%m.%Y").date()
+                birthday = parsed_date
+                continue
+            except ValueError:
+                pass
+
+            if "@" in value:
+                emails.append(value)
+            elif value.replace(".", "").isdigit() and len(value) >= 10:
+                phones.append(value)
+            else:
+                address_parts.append(value)
+
+        address = " ".join(address_parts).strip()
+        contact = Contact(name=name, address=address, birthday=birthday)
+
+        for email in emails:
+            contact.add_email(email)
+        for phone in phones:
+            contact.add_phone(phone)
+
         repo: ContactRepository = context['contact_repo']
 
         try:
