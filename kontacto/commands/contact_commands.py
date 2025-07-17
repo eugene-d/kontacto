@@ -1,5 +1,4 @@
 from typing import List, Dict, Any
-from datetime import date
 from tabulate import tabulate
 from faker import Faker
 from ..commands.base_command import BaseCommand
@@ -234,21 +233,24 @@ class UpcomingBirthdaysCommand(BaseCommand):
         self.name = "birthdays"
         self.aliases = ["bd", "upcoming-birthdays"]
         self.description = "Show upcoming birthdays"
-        self.usage = "birthdays [days]"
+        self.usage = "birthdays <days>"
         self.examples = ["birthdays", "birthdays 30", "bd 7"]
 
     def execute(self, args: List[str], context: Dict[str, Any]) -> None:
-        days = 7  # Default to 7 days
 
-        if args:
-            try:
-                days = int(args[0])
-                if days < 0:
-                    Console.error("Days must be a positive number")
-                    return
-            except ValueError:
-                Console.error("Invalid number of days")
+        if not args:
+            Console.error("You must provide the number of days")
+            Console.info(self.usage)
+            return
+
+        try:
+            days = int(args[0])
+            if days < 0:
+                Console.error("Days must be a positive number")
                 return
+        except ValueError:
+            Console.error("Invalid number of days")
+            return
 
         repo: ContactRepository = context['contact_repo']
         contacts = []

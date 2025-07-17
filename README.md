@@ -102,7 +102,7 @@ kontacto>
 - `search-contacts <query>` or `sc` - Search contacts by any field
 - `edit-contact <name> <field> <value>` - Edit a contact field
 - `delete-contact <name>` - Delete a contact
-- `birthdays [days]` - Show upcoming birthdays
+- `birthdays <days>` - Show upcoming birthdays
 - `generate-contacts [count]` - Generate random test contacts
 
 #### Note Commands
