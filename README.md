@@ -36,8 +36,7 @@ A command-line Kontacto application for managing contacts and notes with intelli
 
 ### Installing Poetry
 
-If you don't have Poetry installed, see [POETRY_SETUP.md](POETRY_SETUP.md) for detailed installation instructions.
-
+If you don’t have Poetry installed, follow the instructions in [Poetry's official documentation](https://python-poetry.org/docs/#installing-with-the-official-installer).
 Quick install:
 ```bash
 # On macOS/Linux/WSL
