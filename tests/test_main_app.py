@@ -2,9 +2,6 @@ import pytest
 from unittest.mock import Mock, patch
 
 from kontacto.main import Kontacto
-from kontacto.repositories.contact_repository import ContactRepository
-from kontacto.repositories.note_repository import NoteRepository
-from kontacto.models.contact import Contact
 
 
 class TestKontacto:

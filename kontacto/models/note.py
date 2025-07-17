@@ -1,7 +1,7 @@
 """Note model for the Personal Assistant application."""
 
 from datetime import datetime
-from typing import List, Dict, Any, Set, Optional
+from typing import Any, Set, Optional
 from ..models.base import BaseModel
 from ..utils.validators import ValidationError
 
@@ -9,7 +9,7 @@ from ..utils.validators import ValidationError
 class Note(BaseModel):
     """Model representing a note with tags."""
     
-    def __init__(self, content: str, tags: Optional[List[str]] = None):
+    def __init__(self, content: str, tags: Optional[list[str]] = None):
         """
         Initialize a note.
         
@@ -41,7 +41,7 @@ class Note(BaseModel):
         self.update_modified_time()
     
     @property
-    def tags(self) -> List[str]:
+    def tags(self) -> list[str]:
         """Get list of tags."""
         return sorted(list(self._tags))
     
@@ -131,7 +131,7 @@ class Note(BaseModel):
         normalized = ''.join(c for c in normalized if c.isalnum() or c in '-_')
         return normalized
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert note to dictionary representation."""
         return {
             'id': self.id,
@@ -141,7 +141,7 @@ class Note(BaseModel):
             'modified_at': self.modified_at.isoformat()
         }
     
-    def from_dict(self, data: Dict[str, Any]) -> None:
+    def from_dict(self, data: dict[str, Any]) -> None:
         """Load note from dictionary representation."""
         self.id = data['id']
         self._content = data['content']

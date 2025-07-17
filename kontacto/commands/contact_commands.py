@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import Any
 from tabulate import tabulate
 from faker import Faker
 from ..commands.base_command import BaseCommand
@@ -22,7 +22,7 @@ class AddContactCommand(BaseCommand):
             "ac 'Jane Smith'"
         ]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 1:
             Console.error("Name is required")
             Console.info(self.usage)
@@ -52,7 +52,7 @@ class ListContactsCommand(BaseCommand):
         self.usage = "list-contacts"
         self.examples = ["list-contacts", "lc"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: ContactRepository = context['contact_repo']
         contacts = repo.get_all()
 
@@ -93,7 +93,7 @@ class SearchContactsCommand(BaseCommand):
         self.usage = "search-contacts <query>"
         self.examples = ["search-contacts john", "sc 555-1234"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Search query is required")
             Console.info(self.usage)
@@ -142,7 +142,7 @@ class EditContactCommand(BaseCommand):
             "edit-contact 'Bob' birthday '1990-01-15'"
         ]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if len(args) < 3:
             Console.error("Name, field, and value are required")
             Console.info(self.usage)
@@ -204,7 +204,7 @@ class DeleteContactCommand(BaseCommand):
         self.usage = "delete-contact <name>"
         self.examples = ["delete-contact 'John Doe'", "dc 'Jane Smith'"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         if not args:
             Console.error("Contact name is required")
             Console.info(self.usage)
@@ -236,7 +236,7 @@ class UpcomingBirthdaysCommand(BaseCommand):
         self.usage = "birthdays <days>"
         self.examples = ["birthdays", "birthdays 30", "bd 7"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
 
         if not args:
             Console.error("You must provide the number of days")
@@ -293,7 +293,7 @@ class GenerateContactsCommand(BaseCommand):
         self.usage = "generate-contacts [count]"
         self.examples = ["generate-contacts", "generate-contacts 50", "gc 100"]
 
-    def execute(self, args: List[str], context: Dict[str, Any]) -> None:
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
         count = 100  # Default to 100 contacts
 
         if args:

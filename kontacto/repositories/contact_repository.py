@@ -1,7 +1,6 @@
 """Contact repository for managing contact persistence."""
 
-from typing import List, Optional
-from datetime import date, timedelta
+from typing import Optional
 from ..models.contact import Contact
 from .base_repository import BaseRepository
 
@@ -17,7 +16,7 @@ class ContactRepository(BaseRepository[Contact]):
             file_path: Path to the contacts data file
         """
         super().__init__(file_path)
-        self._contacts: List[Contact] = self.load_data()
+        self._contacts: list[Contact] = self.load_data()
     
     def add(self, contact: Contact) -> None:
         """
@@ -66,7 +65,7 @@ class ContactRepository(BaseRepository[Contact]):
                 return contact
         return None
     
-    def get_all(self) -> List[Contact]:
+    def get_all(self) -> list[Contact]:
         """
         Get all contacts.
         
@@ -111,7 +110,7 @@ class ContactRepository(BaseRepository[Contact]):
         
         raise ValueError(f"Contact with ID {contact_id} not found")
     
-    def search(self, query: str) -> List[Contact]:
+    def search(self, query: str) -> list[Contact]:
         """
         Search for contacts matching the query.
         
@@ -127,7 +126,7 @@ class ContactRepository(BaseRepository[Contact]):
                 results.append(contact)
         return results
     
-    def get_upcoming_birthdays(self, days: int = 7) -> List[Contact]:
+    def get_upcoming_birthdays(self, days: int = 7) -> list[Contact]:
         """
         Get contacts with birthdays in the next N days.
         
@@ -159,7 +158,7 @@ class ContactRepository(BaseRepository[Contact]):
         """
         return len(self._contacts)
     
-    def load_data(self) -> List[Contact]:
+    def load_data(self) -> list[Contact]:
         """
         Load contacts from file.
         

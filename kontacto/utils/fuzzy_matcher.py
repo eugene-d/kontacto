@@ -1,6 +1,6 @@
 """Fuzzy matching utilities for command suggestions."""
 
-from typing import List, Tuple, Optional
+from typing import Optional
 import shlex
 from rapidfuzz import distance as rapidfuzz_distance, fuzz
 
@@ -19,7 +19,7 @@ def levenshtein_distance(s1: str, s2: str) -> int:
     return int(rapidfuzz_distance.Levenshtein.distance(s1.lower(), s2.lower()))
 
 
-def find_best_match(query: str, candidates: List[str], threshold: float = 0.6) -> Optional[str]:
+def find_best_match(query: str, candidates: list[str], threshold: float = 0.6) -> Optional[str]:
     """
     Find the best matching string from candidates.
     
@@ -47,7 +47,7 @@ def find_best_match(query: str, candidates: List[str], threshold: float = 0.6) -
     return best_match
 
 
-def find_suggestions(query: str, candidates: List[str], max_suggestions: int = 3) -> List[Tuple[str, float]]:
+def find_suggestions(query: str, candidates: list[str], max_suggestions: int = 3) -> list[tuple[str, float]]:
     """
     Find multiple matching suggestions sorted by similarity.
     
@@ -88,7 +88,7 @@ def is_partial_match(query: str, candidate: str) -> bool:
     return candidate.lower().startswith(query.lower())
 
 
-def get_command_suggestions(input_text: str, available_commands: List[str]) -> List[str]:
+def get_command_suggestions(input_text: str, available_commands: list[str]) -> list[str]:
     """
     Get command suggestions based on user input.
     
@@ -111,7 +111,7 @@ def get_command_suggestions(input_text: str, available_commands: List[str]) -> L
     return [cmd for cmd, ratio in fuzzy_suggestions if ratio > 0.4]
 
 
-def parse_command_input(input_text: str, command_aliases: dict) -> Tuple[str, List[str]]:
+def parse_command_input(input_text: str, command_aliases: dict) -> tuple[str, list[str]]:
     """
     Parse command input into command and arguments.
     

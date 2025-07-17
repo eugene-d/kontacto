@@ -1,6 +1,5 @@
 """Command completer for interactive command-line interface."""
 
-from typing import List, Optional
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 from ..utils.fuzzy_matcher import get_command_suggestions
@@ -9,7 +8,7 @@ from ..utils.fuzzy_matcher import get_command_suggestions
 class CommandCompleter(Completer):
     """Completer for command suggestions."""
     
-    def __init__(self, command_names: List[str]):
+    def __init__(self, command_names: list[str]):
         """
         Initialize the command completer.
         
