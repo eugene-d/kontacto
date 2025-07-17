@@ -9,13 +9,13 @@ from .commands.base_command import CommandRegistry
 from .commands.contact_commands import (
     AddContactCommand, ListContactsCommand, SearchContactsCommand,
     EditContactCommand, DeleteContactCommand, UpcomingBirthdaysCommand,
-    GenerateContactsCommand
+    GenerateContactsCommand, CleanContactsCommand
 )
 from .commands.note_commands import (
     AddNoteCommand, ListNotesCommand, SearchNotesCommand,
     SearchByTagCommand, EditNoteCommand, AddTagCommand,
     RemoveTagCommand, DeleteNoteCommand, ListTagsCommand,
-    NotesByTagCommand, GenerateNotesCommand
+    NotesByTagCommand, GenerateNotesCommand, CleanNotesCommand, CleanTagsCommand
 )
 from .repositories.contact_repository import ContactRepository
 from .repositories.note_repository import NoteRepository
@@ -56,6 +56,7 @@ class Kontacto:
         self.command_registry.register(DeleteContactCommand())
         self.command_registry.register(UpcomingBirthdaysCommand())
         self.command_registry.register(GenerateContactsCommand())
+        self.command_registry.register(CleanContactsCommand())
 
         # Note commands
         self.command_registry.register(AddNoteCommand())
@@ -69,6 +70,8 @@ class Kontacto:
         self.command_registry.register(ListTagsCommand())
         self.command_registry.register(NotesByTagCommand())
         self.command_registry.register(GenerateNotesCommand())
+        self.command_registry.register(CleanNotesCommand())
+        self.command_registry.register(CleanTagsCommand())
 
         # Add built-in commands
         self._add_builtin_commands()

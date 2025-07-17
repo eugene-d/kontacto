@@ -474,3 +474,58 @@ class GenerateNotesCommand(BaseCommand):
             Console.success(f"Successfully generated {count} random notes!")
         except Exception as e:
             Console.error(f"Failed to generate notes: {str(e)}") 
+
+
+class CleanNotesCommand(BaseCommand):
+    """Command to delete all notes from the repository."""
+    def __init__(self):
+        super().__init__()
+        self.name = "clean-notes"
+        self.aliases = ["cn", "clear-notes"]
+        self.description = "Delete all notes from the repository"
+        self.usage = "clean-notes"
+        self.examples = ["clean-notes", "cn"]
+
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
+        repo: NoteRepository = context['note_repo']
+        notes = repo.get_all()
+        if not notes:
+            Console.info("No notes to delete.")
+            return
+        if not Console.confirm("Are you sure you want to delete ALL notes? This cannot be undone."):
+            Console.info("Operation cancelled.")
+            return
+        try:
+            repo._notes.clear() if hasattr(repo, '_notes') else None
+            if hasattr(repo, 'save_data'):
+                repo.save_data([])
+            Console.success("All notes deleted successfully!")
+        except Exception as e:
+            Console.error(f"Failed to delete all notes: {str(e)}")
+
+class CleanTagsCommand(BaseCommand):
+    """Command to remove all tags from every note, keeping the notes themselves."""
+    def __init__(self):
+        super().__init__()
+        self.name = "clean-tags"
+        self.aliases = ["ct", "clear-tags"]
+        self.description = "Remove all tags from every note"
+        self.usage = "clean-tags"
+        self.examples = ["clean-tags", "ct"]
+
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
+        repo: NoteRepository = context['note_repo']
+        notes = repo.get_all()
+        if not notes:
+            Console.info("No notes found.")
+            return
+        if not Console.confirm("Are you sure you want to remove ALL tags from every note?"):
+            Console.info("Operation cancelled.")
+            return
+        try:
+            for note in notes:
+                note._tags.clear() if hasattr(note, '_tags') else None
+                repo.update(note)
+            Console.success("All tags removed from all notes!")
+        except Exception as e:
+            Console.error(f"Failed to remove all tags: {str(e)}") 
