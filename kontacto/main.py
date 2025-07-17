@@ -15,7 +15,7 @@ from .commands.note_commands import (
     AddNoteCommand, ListNotesCommand, SearchNotesCommand,
     SearchByTagCommand, EditNoteCommand, AddTagCommand,
     RemoveTagCommand, DeleteNoteCommand, ListTagsCommand,
-    NotesByTagCommand
+    NotesByTagCommand, GenerateNotesCommand
 )
 from .repositories.contact_repository import ContactRepository
 from .repositories.note_repository import NoteRepository
@@ -68,6 +68,7 @@ class Kontacto:
         self.command_registry.register(DeleteNoteCommand())
         self.command_registry.register(ListTagsCommand())
         self.command_registry.register(NotesByTagCommand())
+        self.command_registry.register(GenerateNotesCommand())
 
         # Add built-in commands
         self._add_builtin_commands()

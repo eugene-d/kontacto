@@ -6,6 +6,7 @@ from ..commands.base_command import BaseCommand
 from ..models.note import Note
 from ..repositories.note_repository import NoteRepository
 from ..ui.console import Console
+from faker import Faker
 
 
 class AddNoteCommand(BaseCommand):
@@ -430,3 +431,46 @@ class NotesByTagCommand(BaseCommand):
                 print(f"  • {content_preview}")
                 print(f"    Created: {created}")
                 print() 
+
+
+class GenerateNotesCommand(BaseCommand):
+    """Command to generate random test notes."""
+
+    def __init__(self):
+        super().__init__()
+        self.name = "generate-notes"
+        self.aliases = ["gn", "random-notes"]
+        self.description = "Generate random test notes"
+        self.usage = "generate-notes [count]"
+        self.examples = ["generate-notes", "generate-notes 50", "gn 100"]
+
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
+        count = 100
+        if args:
+            try:
+                count = int(args[0])
+                if count < 1:
+                    Console.error("Count must be a positive number")
+                    return
+            except ValueError:
+                Console.error("Invalid count")
+                return
+
+        repo: NoteRepository = context['note_repo']
+        fake = Faker()
+        Console.info(f"Generating {count} random notes...")
+
+        try:
+            for i in range(count):
+                content = fake.sentence(nb_words=fake.random_int(5, 15))
+
+                tags = [fake.word() for _ in range(fake.random_int(1, 3))]
+                note = Note(content=content, tags=tags)
+                repo.add(note)
+
+                if (i + 1) % 10 == 0:
+                    Console.info(f"Generated {i + 1}/{count} notes...")
+
+            Console.success(f"Successfully generated {count} random notes!")
+        except Exception as e:
+            Console.error(f"Failed to generate notes: {str(e)}") 
