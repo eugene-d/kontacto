@@ -556,8 +556,8 @@ class UpcomingBirthdaysCommand(BaseCommand):
         # We iterate over all contacts and select only those whose birthday is in N days
         for contact in repo.get_all():
             days_left = contact.days_until_birthday()
-            if days_left is not None and days_left == days:
-                contacts.append(contact)
+            if days_left is not None and 0 <= days_left <= days:
+                contacts.append((contact, days_left))
 
         if not contacts:
             Console.info(f"No contacts with birthdays in the next {days} day(s).")
@@ -565,13 +565,13 @@ class UpcomingBirthdaysCommand(BaseCommand):
 
         # Prepare data for table
         table_data = []
-        for contact in contacts:
+        for contact, days_left in contacts:
             birthday_str = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
             table_data.append(
                 [
                     contact.name,
                     birthday_str,
-                    f"{days} days",
+                    f"{days_left} days",
                 ]
             )
 
