@@ -1,5 +1,3 @@
-"""Validators for various data types in the Personal Assistant application."""
-
 import re
 from datetime import date, datetime
 from typing import Optional
@@ -15,9 +13,7 @@ def validate_phone(phone: str) -> str:
     """
     Validate and normalize phone numbers.
 
-    Supports international formats and common variations.
     Returns normalized phone number.
-
     Args:
         phone: Phone number string to validate
 
@@ -30,20 +26,10 @@ def validate_phone(phone: str) -> str:
     # Remove all non-digit characters except +
     cleaned = re.sub(r"[^\d+]", "", phone)
 
-    # Check various phone patterns
-    patterns = [
-        r"^\+?1?\d{10}$",  # US numbers with optional +1
-        r"^\+\d{1,3}\d{7,14}$",  # International format
-        r"^\d{7,15}$",  # Generic format (7-15 digits)
-        r"^\d{3}-\d{4}$",  # XXX-XXXX format
-        r"^\d{3}-\d{3}-\d{4}$",  # XXX-XXX-XXXX format
-    ]
+    if len(cleaned) == 10 and cleaned.isdigit():
+        return cleaned
 
-    for pattern in patterns:
-        if re.match(pattern, cleaned):
-            return cleaned
-
-    raise ValidationError(f"Invalid phone number format: {phone}")
+    raise ValidationError(f"Phone number must be 10 digits long: {phone}")
 
 
 def validate_email(email: str) -> str:

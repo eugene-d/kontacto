@@ -1,4 +1,5 @@
-from .base_command import BaseCommand, CommandRegistry
+from .base_command import BaseCommand
+from .command_registry import CommandRegistry
 from .contact_commands import (
     AddContactCommand,
     DeleteContactCommand,
