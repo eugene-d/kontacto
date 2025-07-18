@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from faker import Faker
 from tabulate import tabulate
 
 from ..commands.base_command import BaseCommand
@@ -227,7 +226,7 @@ class DeleteNoteCommand(BaseCommand):
     def __init__(self):
         super().__init__()
         self.name = "delete-note"
-        self.aliases = ["dn", "remove-note"]
+        self.aliases = ["dn"]
         self.description = "Delete a note"
         self.usage = "delete-note <search-query>"
         self.examples = ["delete-note 'old reminder'", "dn 'temporary note'"]
@@ -281,49 +280,6 @@ class DeleteNoteCommand(BaseCommand):
             Console.success("Note deleted successfully!")
         except Exception as e:
             Console.error(f"Failed to delete note: {str(e)}")
-
-
-class GenerateNotesCommand(BaseCommand):
-    """Command to generate random test notes."""
-
-    def __init__(self):
-        super().__init__()
-        self.name = "generate-notes"
-        self.aliases = ["gn", "random-notes"]
-        self.description = "Generate random test notes"
-        self.usage = "generate-notes [count]"
-        self.examples = ["generate-notes", "generate-notes 50", "gn 100"]
-
-    def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        count = 100
-        if args:
-            try:
-                count = int(args[0])
-                if count < 1:
-                    Console.error("Count must be a positive number")
-                    return
-            except ValueError:
-                Console.error("Invalid count")
-                return
-
-        repo: NoteRepository = context["note_repo"]
-        fake = Faker()
-        Console.info(f"Generating {count} random notes...")
-
-        try:
-            for i in range(count):
-                content = fake.sentence(nb_words=fake.random_int(5, 15))
-
-                tags = [fake.word() for _ in range(fake.random_int(1, 3))]
-                note = Note(content=content, tags=tags)
-                repo.add(note)
-
-                if (i + 1) % 10 == 0:
-                    Console.info(f"Generated {i + 1}/{count} notes...")
-
-            Console.success(f"Successfully generated {count} random notes!")
-        except Exception as e:
-            Console.error(f"Failed to generate notes: {str(e)}")
 
 
 class CleanNotesCommand(BaseCommand):

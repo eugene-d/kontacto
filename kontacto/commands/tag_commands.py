@@ -49,7 +49,7 @@ class RemoveTagCommand(BaseCommand):
         self.name = "remove-tag"
         self.aliases = ["rt"]
         self.description = "Remove tag from a note"
-        self.usage = "remove-tag <search-query> <tag>"
+        self.usage = "remove-tag '<note>' <tag>"
         self.examples = ["remove-tag 'buy milk' urgent", "rt 'project' old"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
@@ -81,7 +81,7 @@ class ListTagsCommand(BaseCommand):
     def __init__(self):
         super().__init__()
         self.name = "list-tags"
-        self.aliases = ["lt", "tags"]
+        self.aliases = ["lt"]
         self.description = "List all tags used in notes"
         self.usage = "list-tags"
         self.examples = ["list-tags", "lt"]

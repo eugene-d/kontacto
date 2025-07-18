@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Any
 
-from faker import Faker
 from tabulate import tabulate
 
 from ..commands.base_command import BaseCommand
@@ -580,69 +579,6 @@ class UpcomingBirthdaysCommand(BaseCommand):
 
         Console.info(f"\nBirthdays in the next {days} days:")
         print(table)
-
-
-class GenerateContactsCommand(BaseCommand):
-    """Command to generate random test contacts."""
-
-    def __init__(self):
-        super().__init__()
-        self.name = "generate-contacts"
-        self.aliases = ["gc", "random-contacts"]
-        self.description = "Generate random test contacts"
-        self.usage = "generate-contacts [count]"
-        self.examples = ["generate-contacts", "generate-contacts 50", "gc 100"]
-
-    def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        count = 100  # Default to 100 contacts
-
-        if args:
-            try:
-                count = int(args[0])
-                if count < 1:
-                    Console.error("Count must be a positive number")
-                    return
-            except ValueError:
-                Console.error("Invalid count")
-                return
-
-        repo: ContactRepository = context["contact_repo"]
-        fake = Faker()
-
-        Console.info(f"Generating {count} random contacts...")
-
-        try:
-            for i in range(count):
-                contact = Contact(name=fake.name(), address=fake.address().replace("\n", ", "))
-
-                # Add random phone numbers (1-3)
-                for _ in range(fake.random_int(1, 3)):
-                    try:
-                        contact.add_phone(fake.phone_number())
-                    except:
-                        pass  # Skip invalid phone numbers
-
-                # Add random emails (1-2)
-                for _ in range(fake.random_int(1, 2)):
-                    try:
-                        contact.add_email(fake.email())
-                    except:
-                        pass
-
-                # Add random birthday (60% chance)
-                if fake.random_int(1, 10) <= 6:
-                    contact.birthday = fake.date_of_birth(minimum_age=18, maximum_age=80)
-
-                repo.add(contact)
-
-                # Show progress
-                if (i + 1) % 10 == 0:
-                    Console.info(f"Generated {i + 1}/{count} contacts...")
-
-            Console.success(f"Successfully generated {count} random contacts!")
-
-        except Exception as e:
-            Console.error(f"Failed to generate contacts: {str(e)}")
 
 
 class CleanContactsCommand(BaseCommand):

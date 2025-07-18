@@ -1,389 +1,119 @@
 # Kontacto
 
-A command-line application for managing contacts and notes with intelligent command recognition.
+A command-line contact and note management application with intelligent command recognition.
 
 ## Features
 
-### Contact Management
-- Store contacts with name, address, multiple phone numbers, multiple emails, and birthday
-- Search contacts by any field
-- Edit and delete contacts
-- Display upcoming birthdays
-- Generate random test contacts
-
-### Notes Management
-- Create, edit, and delete text notes
-- Add tags to notes for categorization
-- Search notes by content or tags
-- Sort and group notes by tags
-
-### Intelligent Command Analysis
-- Fuzzy matching for command suggestions
-- Command aliases for convenience
-- Tab completion for commands
-- Command history with arrow key navigation
-
-### Data Persistence
-- All data is automatically saved using pickle serialization
-- Data persists between application restarts
-- Files are stored in the project root directory
-
-### Development Tools
-- Comprehensive code quality tools (Black, isort, flake8, mypy, codespell)
-- Pre-commit hooks for automated code quality checks
-- Makefile with convenient development commands
-- Dedicated configuration files for each tool
+- **Contact Management**: Store contacts with name, address, phones, emails, and birthdays
+- **Notes Management**: Create, edit, and delete notes with tag support
+- **Search**: Search contacts and notes by any field or tag
+- **Interactive CLI**: Tab completion, command history, and fuzzy matching
+- **Data Persistence**: Automatic data saving with pickle serialization
 
 ## Installation
 
 ### Prerequisites
-- Python 3.9 or higher
-- Poetry (dependency management)
-
-### Installing Poetry
-
-If you don’t have Poetry installed, follow the instructions in [Poetry's official documentation](https://python-poetry.org/docs/#installing-with-the-official-installer).
-Quick install:
-```bash
-# On macOS/Linux/WSL
-curl -sSL https://install.python-poetry.org | python3 -
-```
+- Python 3.9+
+- Poetry
 
 ### Setup
-
-1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd kontacto
-```
-
-2. Install dependencies and set up development tools:
-```bash
-# Complete environment setup (recommended for first-time setup)
 make setup
-
-# Or just install dependencies if you already have Poetry set up
-make install
-
-# Or manually with Poetry:
-poetry install
 ```
 
-For development (includes testing and linting tools):
+### Run
 ```bash
-poetry install --with dev
-```
-
-3. Run the application:
-
-```bash
-# Using Poetry (recommended)
+# Development
 poetry run kontacto
 
-# Or activate the virtual environment first
-source $(poetry env info --path)/bin/activate
+# Install as CLI command
+make install-cli
 kontacto
-
-# Or run directly
-poetry run python -m kontacto.main
 ```
 
 ## Usage
 
-### Starting the Application
-When you start the application, you'll see:
-```
-============================
-Welcome to Personal Kontacto!
-============================
-
-ℹ Type 'help' to see available commands.
-ℹ Use Tab for command completion, arrow keys for history.
-
-kontacto>
-```
-
-### Basic Commands
-
-#### Help
-- `help` or `h` or `?` - Show all available commands
-- `help <command>` - Show detailed help for a specific command
-
-#### Contact Commands
-- `add-contact <name> [address]` - Add a new contact
-- `list-contacts` or `lc` - List all contacts
-- `search-contacts <query>` or `sc` - Search contacts by any field
-- `edit-contact <name> <field> <value>` - Edit a contact field
-- `delete-contact <name>` - Delete a contact
-- `birthdays <days>` - Show upcoming birthdays
-- `generate-contacts [count]` - Generate random test contacts
-
-#### Note Commands
-- `add-note <content> [tag1] [tag2]...` - Add a new note with optional tags
-- `list-notes` or `ln` - List all notes
-- `search-notes <query>` - Search notes by content or tags
-- `search-tag <tag>` - Find notes with a specific tag
-- `edit-note <search-query> <new-content>` - Edit a note
-- `add-tag <search-query> <tag>` - Add a tag to a note
-- `remove-tag <search-query> <tag>` - Remove a tag from a note
-- `delete-note <search-query>` - Delete a note
-- `list-tags` - List all tags with counts
-- `notes-by-tag` - Show notes grouped by tags
-
-#### System Commands
-- `clear` or `cls` - Clear the screen
-- `exit` or `quit` or `q` - Exit the application
-
-### Examples
-
-#### Managing Contacts
+### Contact Commands
 ```bash
-# Add a contact
-kontacto> add-contact "John Doe" "123 Main St, New York, NY"
-
-# Add phone and email to contact
-kontacto> edit-contact "John Doe" add-phone "555-1234"
-kontacto> edit-contact "John Doe" add-email "john@example.com"
-
-# Search for contacts
-kontacto> search-contacts john
-kontacto> sc 555
-
-# Check upcoming birthdays
-kontacto> birthdays 30
-
-# Generate test data
-kontacto> generate-contacts 50
+add-contact <name> [--address=<addr>] [--email=<email>] [--phone=<phone>] [--birthday=<date>]
+list-contacts, lc                    # List all contacts
+search-contacts <query>, sc          # Search contacts
+edit-contact <name>                  # Interactive edit mode
+delete-contact <name>                # Delete contact
+birthdays <days>                     # Show upcoming birthdays
 ```
 
-#### Managing Notes
+### Note Commands
 ```bash
-# Add a note with tags
-kontacto> add-note "Remember to buy milk" shopping urgent
+add-note <content> [tag1] [tag2]...  # Add note with tags
+list-notes, ln                       # List all notes
+search-notes <query>                 # Search notes
+search-tag <tag>                     # Find notes by tag
+edit-note <query> <new-content>      # Edit note
+delete-note <query>                  # Delete note
+list-tags                            # List all tags
+```
+
+### System Commands
+```bash
+help, h, ?                           # Show help
+clear, cls                           # Clear screen
+exit, quit, q                        # Exit application
+```
+
+## Examples
+
+```bash
+# Add contact
+kontacto> add-contact "John Doe" --email=john@example.com --phone=555-1234
+
+# Search contacts
+kontacto> sc john
+
+# Add note with tags
+kontacto> add-note "Meeting notes" work important
 
 # Search notes
-kontacto> search-notes milk
-kontacto> search-tag urgent
-
-# Edit a note
-kontacto> edit-note "buy milk" "Buy milk and bread"
-
-# Manage tags
-kontacto> add-tag "project deadline" important
-kontacto> list-tags
-kontacto> notes-by-tag
+kontacto> search-tag work
 ```
 
-### Command Editing Fields
-
-When editing contacts, you can modify these fields:
-- `name` - Contact's name
-- `address` - Contact's address
-- `add-phone` - Add a phone number
-- `remove-phone` - Remove a phone number
-- `add-email` - Add an email address
-- `remove-email` - Remove an email address
-- `birthday` - Set birthday (format: YYYY-MM-DD)
-- `replace-phone` - Replace phone
-- `replace-email` - Replace email
-
-### Date Formats
-
-The application accepts dates in multiple formats:
-- YYYY-MM-DD (2024-01-15)
-- DD-MM-YYYY (15-01-2024)
-- DD/MM/YYYY (15/01/2024)
-- MM/DD/YYYY (01/15/2024)
-
-### Tips
-
-1. **Use Tab Completion**: Start typing a command and press Tab to autocomplete
-2. **Command History**: Use arrow keys to navigate through previous commands
-3. **Aliases**: Use short aliases like `ac` instead of `add-contact` for faster input
-4. **Fuzzy Matching**: Even if you misspell a command, the kontacto will suggest the closest match
-5. **Multiple Values**: When searching, the query will match any field in contacts or notes
-
-## Data Storage
-
-- Contacts are stored in `contacts.pkl`
-- Notes are stored in `notes.pkl`
-- Command history is stored in `.kontacto_history`
-
-All files are stored in the project root directory and are automatically created on first use.
-
-## Error Handling
-
-The application includes comprehensive error handling:
-- Invalid input validation with helpful error messages
-- Graceful handling of missing data files
-- Clear feedback for all operations
-- Suggestions for misspelled commands
-
 ## Development
+
+### Commands
+```bash
+make setup      # Install dependencies and setup environment
+make test       # Run tests
+make format     # Format code
+make lint       # Run linting
+make clean      # Clean cache files
+```
 
 ### Project Structure
 ```
 kontacto/
 ├── kontacto/
-│   ├── models/           # Data models (Contact, Note)
+│   ├── models/           # Data models
 │   ├── commands/         # Command implementations
-│   ├── repositories/     # Data persistence layer
-│   ├── ui/              # User interface utilities
-│   ├── utils/           # Helper utilities
-│   └── main.py          # Application entry point
+│   ├── repositories/     # Data persistence
+│   ├── ui/              # CLI interface
+│   └── utils/           # Utilities
 ├── tests/               # Test files
-├── .flake8             # Flake8 linter configuration
-├── .isort.cfg          # Import sorting configuration
-├── black.toml          # Code formatting configuration
-├── mypy.ini            # Type checking configuration
-├── .codespellrc        # Spell checking configuration
-├── .pre-commit-config.yaml # Pre-commit hooks configuration
-├── Makefile            # Development commands
-└── pyproject.toml      # Poetry project configuration
+└── pyproject.toml       # Project configuration
 ```
 
-### Design Patterns Used
-- **Command Pattern**: For handling user commands
-- **Repository Pattern**: For data access and persistence
-- **Factory Pattern**: For creating model instances
-- **Observer Pattern**: For event notifications
+### Data Storage
+- Contacts: `contacts.pkl`
+- Notes: `notes.pkl`
+- History: `.kontacto_history`
 
-#### Development Commands
+## Requirements
 
-Use the Makefile for convenient development tasks:
-
-```bash
-# Complete environment setup (check Poetry, create venv, install deps)
-make setup
-
-# Check environment status and requirements
-make status
-
-# Install dependencies and set up pre-commit hooks
-make install
-
-# Format code (black + isort)
-make format
-
-# Run all linting checks
-make lint
-
-# Run format and lint checks without making changes
-make check
-
-# Run spell check and fix issues
-make spell-check
-
-# Run tests
-make test
-
-# Set up pre-commit hooks
-make pre-commit
-
-# Clean up cache files
-make clean
-
-# Show all available commands
-make help
-```
-
-#### Pre-commit Hooks
-
-The project uses pre-commit hooks to automatically run code quality checks:
-
-```bash
-# Install pre-commit hooks (done automatically with 'make install')
-poetry run pre-commit install
-
-# Run pre-commit hooks on all files
-poetry run pre-commit run --all-files
-```
-
-#### Configuration Files
-
-- `.flake8` - Flake8 linter settings
-- `.isort.cfg` - Import sorting settings
-- `black.toml` - Code formatting settings
-- `mypy.ini` - Type checking settings
-- `.codespellrc` - Spell checking settings
-
-### Running Tests
-
-```bash
-# Run all tests
-make test
-# or
-poetry run pytest
-
-# Run with verbose output
-poetry run pytest -v
-
-# Run with coverage report
-poetry run pytest --cov=kontacto --cov-report=term-missing
-```
-
-### Code Quality Workflow
-
-1. **Before committing**: Run `make lint` to check code quality
-2. **Auto-format**: Run `make format` to format code
-3. **Pre-commit**: Hooks will automatically run on commit
-4. **Spell check**: Run `make spell-check` to fix typos
-
-### Development Setup
-
-```bash
-# Clone and set up the project
-git clone <repository-url>
-cd kontacto
-
-# Complete environment setup (recommended for first-time setup)
-make setup
-
-# Check environment status anytime
-make status
-
-# Make changes to code...
-
-# Format and check code quality
-make format
-make lint
-
-# Run tests
-make test
-
-# Commit changes (pre-commit hooks will run automatically)
-git add .
-git commit -m "Your commit message"
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Poetry not found**
-   - Install Poetry following the instructions in the Prerequisites section
-   - Make sure Poetry is in your PATH: `export PATH="$HOME/.local/bin:$PATH"`
-
-2. **Command not found: kontacto**
-   - Make sure you're using `poetry run kontacto`
-   - Or activate the Poetry shell first: `poetry shell`
-
-3. **Module not found errors**
-   - Make sure you're in the `kontacto` directory
-   - Run `poetry install` to install all dependencies
-   - Use `poetry run` to execute commands in the virtual environment
-
-4. **Python version errors**
-   - Ensure you have Python 3.9 or higher: `python3 --version`
-   - Poetry will automatically use the correct Python version
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with proper tests
-4. Submit a pull request
+- Python 3.9+
+- Poetry for dependency management
+- Unix-like system for Makefile (optional)
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License
