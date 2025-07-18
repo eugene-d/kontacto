@@ -162,7 +162,7 @@ class TestIntegration:
 
         # Edit the contact
         with patch("builtins.print") as mock_print:
-            app.process_command('edit-contact "John Doe" add-phone "555-1234"')
+            app.process_command('edit-contact "John Doe" add-phone "555-123-4567"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "updated successfully" in output
 
@@ -170,7 +170,7 @@ class TestIntegration:
         with patch("builtins.print") as mock_print:
             app.process_command("list-contacts")
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
-            assert "5551234" in output  # Phone numbers are displayed without dashes
+            assert "5551234567" in output  # Phone numbers are displayed without dashes
 
     def test_full_note_workflow(self, app):
         """Test complete note management workflow."""

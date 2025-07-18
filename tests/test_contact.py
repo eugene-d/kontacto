@@ -25,12 +25,12 @@ class TestContact:
         contact = Contact(name="Jane Smith")
 
         # Add valid phone
-        contact.add_phone("555-1234")
+        contact.add_phone("555-123-4567")
         assert len(contact.phones) == 1
 
         # Try to add duplicate
         with pytest.raises(ValidationError):
-            contact.add_phone("555-1234")
+            contact.add_phone("555-123-4567")
 
     def test_add_email(self):
         """Test adding email addresses to a contact."""
@@ -92,7 +92,7 @@ class TestContact:
         """Test serialization and deserialization."""
         # Create contact with data
         contact1 = Contact(name="Serialize Test", address="123 Test St")
-        contact1.add_phone("555-0000")
+        contact1.add_phone("555-000-0000")
         contact1.add_email("test@test.com")
         contact1.birthday = date(1985, 5, 15)
 
