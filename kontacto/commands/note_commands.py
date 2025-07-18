@@ -6,6 +6,7 @@ from ..commands.base_command import BaseCommand
 from ..models.note import Note
 from ..repositories.note_repository import NoteRepository
 from ..ui.console import Console
+from faker import Faker
 
 
 class AddNoteCommand(BaseCommand):
@@ -228,86 +229,6 @@ class EditNoteCommand(BaseCommand):
             Console.error(f"Failed to update note: {str(e)}")
 
 
-class AddTagCommand(BaseCommand):
-    """Command to add tag to a note."""
-    
-    def __init__(self):
-        super().__init__()
-        self.name = "add-tag"
-        self.aliases = ["at"]
-        self.description = "Add tag to a note"
-        self.usage = "add-tag <search-query> <tag>"
-        self.examples = ["add-tag 'buy milk' urgent", "at 'project' important"]
-    
-    def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        if len(args) < 2:
-            Console.error("Search query and tag are required")
-            Console.info(self.usage)
-            return
-        
-        search_query = args[0]
-        tag = args[1]
-        
-        repo: NoteRepository = context['note_repo']
-        notes = repo.search(search_query)
-        
-        if not notes:
-            Console.error(f"No notes found matching '{search_query}'")
-            return
-        
-        if len(notes) > 1:
-            Console.warning(f"Found {len(notes)} notes. Adding tag to first match.")
-        
-        note = notes[0]
-        
-        try:
-            note.add_tag(tag)
-            repo.update(note)
-            Console.success(f"Tag '{tag}' added successfully!")
-        except Exception as e:
-            Console.error(f"Failed to add tag: {str(e)}")
-
-
-class RemoveTagCommand(BaseCommand):
-    """Command to remove tag from a note."""
-    
-    def __init__(self):
-        super().__init__()
-        self.name = "remove-tag"
-        self.aliases = ["rt"]
-        self.description = "Remove tag from a note"
-        self.usage = "remove-tag <search-query> <tag>"
-        self.examples = ["remove-tag 'buy milk' urgent", "rt 'project' old"]
-    
-    def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        if len(args) < 2:
-            Console.error("Search query and tag are required")
-            Console.info(self.usage)
-            return
-        
-        search_query = args[0]
-        tag = args[1]
-        
-        repo: NoteRepository = context['note_repo']
-        notes = repo.search(search_query)
-        
-        if not notes:
-            Console.error(f"No notes found matching '{search_query}'")
-            return
-        
-        if len(notes) > 1:
-            Console.warning(f"Found {len(notes)} notes. Removing tag from first match.")
-        
-        note = notes[0]
-        
-        try:
-            note.remove_tag(tag)
-            repo.update(note)
-            Console.success(f"Tag '{tag}' removed successfully!")
-        except Exception as e:
-            Console.error(f"Failed to remove tag: {str(e)}")
-
-
 class DeleteNoteCommand(BaseCommand):
     """Command to delete a note."""
     
@@ -370,63 +291,72 @@ class DeleteNoteCommand(BaseCommand):
             Console.error(f"Failed to delete note: {str(e)}")
 
 
-class ListTagsCommand(BaseCommand):
-    """Command to list all tags."""
-    
+class GenerateNotesCommand(BaseCommand):
+    """Command to generate random test notes."""
+
     def __init__(self):
         super().__init__()
-        self.name = "list-tags"
-        self.aliases = ["lt", "tags"]
-        self.description = "List all tags used in notes"
-        self.usage = "list-tags"
-        self.examples = ["list-tags", "lt"]
-    
+        self.name = "generate-notes"
+        self.aliases = ["gn", "random-notes"]
+        self.description = "Generate random test notes"
+        self.usage = "generate-notes [count]"
+        self.examples = ["generate-notes", "generate-notes 50", "gn 100"]
+
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
+        count = 100
+        if args:
+            try:
+                count = int(args[0])
+                if count < 1:
+                    Console.error("Count must be a positive number")
+                    return
+            except ValueError:
+                Console.error("Invalid count")
+                return
+
         repo: NoteRepository = context['note_repo']
-        tags = repo.get_all_tags()
-        
-        if not tags:
-            Console.info("No tags found")
-            return
-        
-        # Get count for each tag
-        table_data = []
-        for tag in tags:
-            count = repo.count_by_tag(tag)
-            table_data.append([tag, count])
-        
-        headers = ["Tag", "Note Count"]
-        table = tabulate(table_data, headers=headers, tablefmt="grid")
-        
-        Console.info(f"\nTotal tags: {len(tags)}")
-        print(table)
+        fake = Faker()
+        Console.info(f"Generating {count} random notes...")
+
+        try:
+            for i in range(count):
+                content = fake.sentence(nb_words=fake.random_int(5, 15))
+
+                tags = [fake.word() for _ in range(fake.random_int(1, 3))]
+                note = Note(content=content, tags=tags)
+                repo.add(note)
+
+                if (i + 1) % 10 == 0:
+                    Console.info(f"Generated {i + 1}/{count} notes...")
+
+            Console.success(f"Successfully generated {count} random notes!")
+        except Exception as e:
+            Console.error(f"Failed to generate notes: {str(e)}") 
 
 
-class NotesByTagCommand(BaseCommand):
-    """Command to show notes grouped by tags."""
-    
+class CleanNotesCommand(BaseCommand):
+    """Command to delete all notes from the repository."""
     def __init__(self):
         super().__init__()
-        self.name = "notes-by-tag"
-        self.aliases = ["nbt", "grouped"]
-        self.description = "Show notes grouped by tags"
-        self.usage = "notes-by-tag"
-        self.examples = ["notes-by-tag", "nbt"]
-    
+        self.name = "clean-notes"
+        self.aliases = ["cn", "clear-notes"]
+        self.description = "Delete all notes from the repository"
+        self.usage = "clean-notes"
+        self.examples = ["clean-notes", "cn"]
+
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
         repo: NoteRepository = context['note_repo']
-        grouped = repo.get_notes_by_tags()
-        
-        if not grouped:
-            Console.info("No tagged notes found")
+        notes = repo.get_all()
+        if not notes:
+            Console.info("No notes to delete.")
             return
-        
-        for tag, notes in grouped.items():
-            Console.header(f"Tag: {tag} ({len(notes)} notes)")
-            
-            for note in notes:
-                content_preview = note.content[:80] + "..." if len(note.content) > 80 else note.content
-                created = note.created_at.strftime("%Y-%m-%d %H:%M")
-                print(f"  • {content_preview}")
-                print(f"    Created: {created}")
-                print() 
+        if not Console.confirm("Are you sure you want to delete ALL notes? This cannot be undone."):
+            Console.info("Operation cancelled.")
+            return
+        try:
+            repo._notes.clear() if hasattr(repo, '_notes') else None
+            if hasattr(repo, 'save_data'):
+                repo.save_data([])
+            Console.success("All notes deleted successfully!")
+        except Exception as e:
+            Console.error(f"Failed to delete all notes: {str(e)}") 

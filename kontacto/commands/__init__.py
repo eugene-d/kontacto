@@ -6,8 +6,13 @@ from .contact_commands import (
 )
 from .note_commands import (
     AddNoteCommand, ListNotesCommand, SearchNotesCommand,
-    SearchByTagCommand, EditNoteCommand, AddTagCommand,
-    RemoveTagCommand, DeleteNoteCommand, ListTagsCommand,
+    SearchByTagCommand, EditNoteCommand,
+    DeleteNoteCommand
+)
+
+from .tag_commands import (
+    AddTagCommand,
+    RemoveTagCommand, ListTagsCommand,
     NotesByTagCommand
 )
 

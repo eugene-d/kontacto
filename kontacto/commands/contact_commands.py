@@ -346,3 +346,32 @@ class GenerateContactsCommand(BaseCommand):
 
         except Exception as e:
             Console.error(f"Failed to generate contacts: {str(e)}")
+
+
+class CleanContactsCommand(BaseCommand):
+    """Command to delete all contacts from the repository."""
+    def __init__(self):
+        super().__init__()
+        self.name = "clean-contacts"
+        self.aliases = ["cc", "clear-contacts"]
+        self.description = "Delete all contacts from the repository"
+        self.usage = "clean-contacts"
+        self.examples = ["clean-contacts", "cc"]
+
+    def execute(self, args: list[str], context: dict[str, Any]) -> None:
+        repo: ContactRepository = context['contact_repo']
+        contacts = repo.get_all()
+        if not contacts:
+            Console.info("No contacts to delete.")
+            return
+        if not Console.confirm("Are you sure you want to delete ALL contacts? This cannot be undone."):
+            Console.info("Operation cancelled.")
+            return
+        try:
+            repo._notes.clear() if hasattr(repo, '_notes') else None
+            repo._contacts.clear() if hasattr(repo, '_contacts') else None
+            if hasattr(repo, 'save_data'):
+                repo.save_data([])
+            Console.success("All contacts deleted successfully!")
+        except Exception as e:
+            Console.error(f"Failed to delete all contacts: {str(e)}")

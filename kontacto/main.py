@@ -9,13 +9,16 @@ from .commands.base_command import CommandRegistry
 from .commands.contact_commands import (
     AddContactCommand, ListContactsCommand, SearchContactsCommand,
     EditContactCommand, DeleteContactCommand, UpcomingBirthdaysCommand,
-    GenerateContactsCommand
+    GenerateContactsCommand, CleanContactsCommand
 )
 from .commands.note_commands import (
     AddNoteCommand, ListNotesCommand, SearchNotesCommand,
-    SearchByTagCommand, EditNoteCommand, AddTagCommand,
-    RemoveTagCommand, DeleteNoteCommand, ListTagsCommand,
-    NotesByTagCommand
+    SearchByTagCommand, EditNoteCommand, DeleteNoteCommand,
+    GenerateNotesCommand, CleanNotesCommand
+)
+from .commands.tag_commands import (
+    AddTagCommand, RemoveTagCommand, ListTagsCommand,
+    NotesByTagCommand, CleanTagsCommand
 )
 from .repositories.contact_repository import ContactRepository
 from .repositories.note_repository import NoteRepository
@@ -56,6 +59,7 @@ class Kontacto:
         self.command_registry.register(DeleteContactCommand())
         self.command_registry.register(UpcomingBirthdaysCommand())
         self.command_registry.register(GenerateContactsCommand())
+        self.command_registry.register(CleanContactsCommand())
 
         # Note commands
         self.command_registry.register(AddNoteCommand())
@@ -63,11 +67,16 @@ class Kontacto:
         self.command_registry.register(SearchNotesCommand())
         self.command_registry.register(SearchByTagCommand())
         self.command_registry.register(EditNoteCommand())
+        self.command_registry.register(DeleteNoteCommand())
+        self.command_registry.register(GenerateNotesCommand())
+        self.command_registry.register(CleanNotesCommand())
+
+        # Tag commands
         self.command_registry.register(AddTagCommand())
         self.command_registry.register(RemoveTagCommand())
-        self.command_registry.register(DeleteNoteCommand())
         self.command_registry.register(ListTagsCommand())
         self.command_registry.register(NotesByTagCommand())
+        self.command_registry.register(CleanTagsCommand())
 
         # Add built-in commands
         self._add_builtin_commands()
@@ -112,11 +121,15 @@ class Kontacto:
                     # Group commands by category
                     contact_commands = []
                     note_commands = []
+                    tag_commands = []
                     other_commands = []
 
                     for cmd in commands:
                         if 'contact' in cmd.name:
                             contact_commands.append(cmd)
+                        elif cmd.name in [
+                            'add-tag', 'remove-tag', 'list-tags', 'notes-by-tag', 'clean-tags']:
+                            tag_commands.append(cmd)
                         elif 'note' in cmd.name or 'tag' in cmd.name:
                             note_commands.append(cmd)
                         else:
@@ -132,6 +145,12 @@ class Kontacto:
                     if note_commands:
                         print("\nNote Commands:")
                         for cmd in sorted(note_commands, key=lambda x: x.name):
+                            aliases = f" ({', '.join(cmd.aliases)})" if cmd.aliases else ""
+                            print(f"  {cmd.name:<20} {cmd.description}{aliases}")
+
+                    if tag_commands:
+                        print("\nTag Commands:")
+                        for cmd in sorted(tag_commands, key=lambda x: x.name):
                             aliases = f" ({', '.join(cmd.aliases)})" if cmd.aliases else ""
                             print(f"  {cmd.name:<20} {cmd.description}{aliases}")
 
