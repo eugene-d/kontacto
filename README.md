@@ -171,6 +171,8 @@ When editing contacts, you can modify these fields:
 - `add-email` - Add an email address
 - `remove-email` - Remove an email address
 - `birthday` - Set birthday (format: YYYY-MM-DD)
+- `replace-phone` - Replace phone
+- `replace-email` - Replace email
 
 ### Date Formats
 

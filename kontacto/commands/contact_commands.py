@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from tabulate import tabulate
 from faker import Faker
@@ -16,9 +17,9 @@ class AddContactCommand(BaseCommand):
         self.name = "add-contact"
         self.aliases = ["ac", "new-contact"]
         self.description = "Add a new contact"
-        self.usage = "add-contact <name> [address]"
+        self.usage = "add-contact <name> [address][email][phone][birthday]"
         self.examples = [
-            "add-contact 'John Doe' '123 Main St, City'",
+            "add-contact 'John' '123 Main St' 'john@example.com' '0501234567' '15.04.1990'",
             "ac 'Jane Smith'"
         ]
 
@@ -29,9 +30,34 @@ class AddContactCommand(BaseCommand):
             return
 
         name = args[0]
-        address = " ".join(args[1:]) if len(args) > 1 else ""
+        address_parts = []
+        emails = []
+        phones = []
+        birthday = None
 
-        contact = Contact(name=name, address=address)
+        for value in args[1:]:
+            try:
+                parsed_date = datetime.strptime(value, "%d.%m.%Y").date()
+                birthday = parsed_date
+                continue
+            except ValueError:
+                pass
+
+            if "@" in value:
+                emails.append(value)
+            elif value.replace(".", "").isdigit() and len(value) >= 10:
+                phones.append(value)
+            else:
+                address_parts.append(value)
+
+        address = " ".join(address_parts).strip()
+        contact = Contact(name=name, address=address, birthday=birthday)
+
+        for email in emails:
+            contact.add_email(email)
+        for phone in phones:
+            contact.add_phone(phone)
+
         repo: ContactRepository = context['contact_repo']
 
         try:
@@ -146,6 +172,11 @@ class EditContactCommand(BaseCommand):
         if len(args) < 3:
             Console.error("Name, field, and value are required")
             Console.info(self.usage)
+            Console.info(
+                "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, "
+                "remove-email, replace-email")
+            Console.info("Example: edit-contact 'John' replace-phone '0501234567 0507654321'")
+            Console.info("Note: you can edit only one field at a time.")
             return
 
         name = args[0]
@@ -162,16 +193,10 @@ class EditContactCommand(BaseCommand):
         try:
             if field == "name":
                 contact.name = value
+
             elif field == "address":
                 contact.address = value
-            elif field == "add-phone":
-                contact.add_phone(value)
-            elif field == "remove-phone":
-                contact.remove_phone(value)
-            elif field == "add-email":
-                contact.add_email(value)
-            elif field == "remove-email":
-                contact.remove_email(value)
+
             elif field == "birthday":
                 birthday = parse_date(value)
                 if birthday:
@@ -179,9 +204,43 @@ class EditContactCommand(BaseCommand):
                 else:
                     Console.error("Invalid date format. Use YYYY-MM-DD")
                     return
+
+            elif field == "add-phone":
+                contact.add_phone(value)
+
+            elif field == "remove-phone":
+                contact.remove_phone(value)
+
+            elif field == "replace-phone":
+                old_new = value.split()
+                if len(old_new) != 2:
+                    Console.error("Usage: replace-phone '<old>' '<new>'")
+                    return
+                old_phone, new_phone = old_new
+                contact.remove_phone(old_phone)
+                contact.add_phone(new_phone)
+
+            elif field == "add-email":
+                contact.add_email(value)
+
+            elif field == "remove-email":
+                contact.remove_email(value)
+
+            elif field == "replace-email":
+                old_new = value.split()
+                if len(old_new) != 2:
+                    Console.error("Usage: replace-email '<old>' '<new>'")
+                    return
+                old_email, new_email = old_new
+                contact.remove_email(old_email)
+                contact.add_email(new_email)
+
             else:
                 Console.error(f"Unknown field: {field}")
-                Console.info("Available fields: name, address, add-phone, remove-phone, add-email, remove-email, birthday")
+                Console.info(
+                    "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, "
+                    "remove-email, replace-email "
+                )
                 return
 
             repo.update(contact)
