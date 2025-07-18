@@ -35,14 +35,36 @@ class CommandCompleter(Completer):
         if " " in text:
             return
 
-        # Get suggestions
+        text = text.strip()
+
+        if not text:
+            return
+
         suggestions = get_command_suggestions(text, self.command_names)
 
-        # Yield completions
-        for suggestion in suggestions:
+        if suggestions:
+            for suggestion in suggestions:
+                yield Completion(
+                    suggestion,
+                    start_position=-len(text),
+                    display=suggestion,
+                    display_meta="",
+                )
+        else:
             yield Completion(
-                suggestion,
+                "help",
                 start_position=-len(text),
-                display=suggestion,
-                display_meta="",
+                display="help",
+                display_meta="💡 Type 'help' to see all available commands",
             )
+
+            popular_commands = ["add-contact", "add-note", "list-contacts", "list-notes", "search-contacts"]
+            available_popular = [cmd for cmd in popular_commands if cmd in self.command_names]
+
+            for cmd in available_popular[:3]:
+                yield Completion(
+                    cmd,
+                    start_position=-len(text),
+                    display=cmd,
+                    display_meta="📝 Popular command",
+                )

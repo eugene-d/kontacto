@@ -3,7 +3,9 @@ from typing import Any
 
 from colorama import init as init_colorama
 from prompt_toolkit import prompt
+from prompt_toolkit.filters import completion_is_selected, has_completions
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.shortcuts import CompleteStyle
 
 from .commands.builtin_commands import ClearCommand, ExitCommand, HelpCommand
@@ -57,6 +59,38 @@ class Kontacto:
             "note_repo": self.note_repo,
             "kontacto": self,
         }
+
+        # Set up key bindings for better Tab completion
+        self.key_bindings = self._setup_key_bindings()
+
+    def _setup_key_bindings(self) -> KeyBindings:
+        """Set up custom key bindings for enhanced completion."""
+        bindings = KeyBindings()
+
+        @bindings.add("tab", filter=has_completions)
+        def _(event):
+            """Handle Tab key for completion cycling."""
+            event.app.current_buffer.complete_next()
+
+        @bindings.add("s-tab", filter=has_completions)  # Shift+Tab
+        def _(event):
+            """Handle Shift+Tab for reverse completion cycling."""
+            event.app.current_buffer.complete_previous()
+
+        @bindings.add("enter", filter=completion_is_selected)
+        def _(event):
+            """Handle Enter key when completion is selected."""
+            # Just complete the text without executing
+            event.app.current_buffer.complete_state = None
+            # Add a space after completion so user can continue typing arguments
+            event.app.current_buffer.insert_text(" ")
+
+        @bindings.add("escape", filter=has_completions)
+        def _(event):
+            """Handle Escape key to cancel completion."""
+            event.app.current_buffer.complete_state = None
+
+        return bindings
 
     def _register_commands(self) -> None:
         # Contact commands
@@ -148,7 +182,7 @@ class Kontacto:
         """Run the main application loop."""
         Console.header("Welcome to Kontacto!")
         Console.info("Type 'help' to see available commands.")
-        Console.info("Use Tab for command completion, arrow keys for history.\n")
+        Console.info("Use Tab to cycle through completions, Shift+Tab to go back, arrow keys for history.\n")
 
         # Command history
         history = FileHistory(".kontacto_history")
@@ -159,8 +193,10 @@ class Kontacto:
                 user_input = prompt(
                     "kontacto> ",
                     completer=self.completer,
-                    complete_style=CompleteStyle.READLINE_LIKE,
+                    complete_style=CompleteStyle.MULTI_COLUMN,
+                    complete_while_typing=False,  # Only show completions when Tab is pressed
                     history=history,
+                    key_bindings=self.key_bindings,
                 )
 
                 self.process_command(user_input)

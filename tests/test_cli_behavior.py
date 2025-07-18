@@ -78,9 +78,9 @@ class TestCLIBehavior:
         """Test various command parsing scenarios."""
         test_cases = [
             (
-                "add-contact 'John Doe' '123 Main St'",
+                "add-contact 'John Doe' --address='123 Main St'",
                 "add-contact",
-                ["John Doe", "123 Main St"],
+                ["John Doe", "--address=123 Main St"],
             ),
             ("list-contacts", "list-contacts", []),
             ("search-contacts john", "search-contacts", ["john"]),
@@ -130,9 +130,20 @@ class TestCLIBehavior:
 
         completer = CommandCompleter(["add-contact", "list-contacts", "search-contacts"])
 
-        # Test completion with alias
+        # Test completion with alias that's not in the command list
         completions = list(completer.get_completions(Mock(text="ac"), Mock(text="ac")))
-        assert len(completions) == 0  # 'ac' is not a base command, it's an alias
+        # With enhanced completion, when no matches are found, it shows help and popular commands
+        assert len(completions) > 0  # Should show help and popular commands as fallback
+
+        # Check that help is included in the suggestions
+        completion_texts = [c.text for c in completions]
+        assert "help" in completion_texts  # Should include help command
+
+        # Check that popular commands are included
+        popular_in_completions = [
+            cmd for cmd in completion_texts if cmd in ["add-contact", "list-contacts", "search-contacts"]
+        ]
+        assert len(popular_in_completions) > 0  # Should include some popular commands
 
     def test_fuzzy_matching(self):
         """Test fuzzy matching for command suggestions."""
@@ -158,7 +169,7 @@ class TestCLIBehavior:
     def test_quoted_arguments(self, app):
         """Test that quoted arguments are parsed correctly."""
         # Test with quoted arguments
-        app.process_command('add-contact "John Doe" "123 Main St"')
+        app.process_command('add-contact "John Doe" --address="123 Main St"')
 
         # The command should be processed without errors
         # Since we're mocking the repositories, we can't test the actual addition
