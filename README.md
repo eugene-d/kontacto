@@ -18,7 +18,7 @@ A command-line contact and note management application with intelligent command 
 
 ### Setup
 ```bash
-git clone <repository-url>
+git clone git@github.com:eugene-d/kontacto.git
 cd kontacto
 make setup
 ```
@@ -29,7 +29,7 @@ make setup
 poetry run kontacto
 
 # Install as CLI command
-make install-cli
+make install
 kontacto
 ```
 
