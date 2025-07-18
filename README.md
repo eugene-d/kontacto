@@ -53,7 +53,11 @@ search-notes <query>                 # Search notes
 search-tag <tag>                     # Find notes by tag
 edit-note <query> <new-content>      # Edit note
 delete-note <query>                  # Delete note
-list-tags                            # List all tags
+add-tag, at                          # Add tag to note (interactive)
+remove-tag, rt                       # Remove tag from note (interactive)
+list-tags, lt                        # List all tags
+notes-by-tag, nbt                    # Show notes grouped by tags
+clean-tags, ct                       # Remove all tags from all notes
 ```
 
 ### System Commands
@@ -75,8 +79,20 @@ kontacto> sc john
 # Add note with tags
 kontacto> add-note "Meeting notes" work important
 
-# Search notes
+# Search notes by tag
 kontacto> search-tag work
+
+# Add tag to note interactively (shows all notes, then asks for tag name)
+kontacto> add-tag
+
+# Remove tag interactively (shows all notes with tags, then their tags)
+kontacto> remove-tag
+
+# List all tags
+kontacto> list-tags
+
+# View notes grouped by tags
+kontacto> notes-by-tag
 ```
 
 ## Development

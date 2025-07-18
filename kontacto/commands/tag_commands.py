@@ -14,29 +14,52 @@ class AddTagCommand(BaseCommand):
         super().__init__()
         self.name = "add-tag"
         self.aliases = ["at"]
-        self.description = "Add tag to a note"
-        self.usage = "add-tag <search-query> <tag>"
-        self.examples = ["add-tag 'buy milk' urgent", "at 'project' important"]
+        self.description = "Add tag to a note (interactive)"
+        self.usage = "add-tag"
+        self.examples = ["add-tag", "at"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        if len(args) < 2:
-            Console.error("Search query and tag are required")
-            Console.info(self.usage)
-            return
-        search_query = args[0]
-        tag = args[1]
         repo: NoteRepository = context["note_repo"]
-        notes = repo.search(search_query)
-        if not notes:
-            Console.error(f"No notes found matching '{search_query}'")
+
+        # Get all notes
+        all_notes = repo.get_all()
+
+        if not all_notes:
+            Console.info("No notes found")
             return
-        if len(notes) > 1:
-            Console.warning(f"Found {len(notes)} notes. Adding tag to first match.")
-        note = notes[0]
+
+        # Show all notes for selection
+        Console.info(f"Found {len(all_notes)} notes:")
+        for i, note in enumerate(all_notes):
+            content_preview = note.content[:60] + "..." if len(note.content) > 60 else note.content
+            tags_str = ", ".join(sorted(note.tags)) if note.tags else "no tags"
+            print(f"{i+1}. {content_preview}")
+            print(f"   Tags: {tags_str}")
+
+        # Ask user to select a note
         try:
-            note.add_tag(tag)
-            repo.update(note)
-            Console.success(f"Tag '{tag}' added successfully!")
+            choice = int(Console.prompt("Select note number (0 to cancel)"))
+            if choice == 0:
+                return
+            if choice < 1 or choice > len(all_notes):
+                Console.error("Invalid selection")
+                return
+            selected_note = all_notes[choice - 1]
+        except ValueError:
+            Console.error("Invalid input")
+            return
+
+        # Ask for tag name
+        tag_name = Console.prompt("Enter tag name to add").strip()
+        if not tag_name:
+            Console.error("Tag name cannot be empty")
+            return
+
+        # Add the tag
+        try:
+            selected_note.add_tag(tag_name)
+            repo.update(selected_note)
+            Console.success(f"Tag '{tag_name}' added successfully!")
         except Exception as e:
             Console.error(f"Failed to add tag: {str(e)}")
 
@@ -48,29 +71,66 @@ class RemoveTagCommand(BaseCommand):
         super().__init__()
         self.name = "remove-tag"
         self.aliases = ["rt"]
-        self.description = "Remove tag from a note"
-        self.usage = "remove-tag '<note>' <tag>"
-        self.examples = ["remove-tag 'buy milk' urgent", "rt 'project' old"]
+        self.description = "Remove tag from a note (interactive)"
+        self.usage = "remove-tag"
+        self.examples = ["remove-tag", "rt"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        if len(args) < 2:
-            Console.error("Search query and tag are required")
-            Console.info(self.usage)
-            return
-        search_query = args[0]
-        tag = args[1]
         repo: NoteRepository = context["note_repo"]
-        notes = repo.search(search_query)
-        if not notes:
-            Console.error(f"No notes found matching '{search_query}'")
+
+        # Get all notes that have tags
+        all_notes = repo.get_all()
+        notes_with_tags = [note for note in all_notes if note.tags]
+
+        if not notes_with_tags:
+            Console.info("No notes with tags found")
             return
-        if len(notes) > 1:
-            Console.warning(f"Found {len(notes)} notes. Removing tag from first match.")
-        note = notes[0]
+
+        # Show notes with tags for selection
+        Console.info(f"Found {len(notes_with_tags)} notes with tags:")
+        for i, note in enumerate(notes_with_tags):
+            content_preview = note.content[:60] + "..." if len(note.content) > 60 else note.content
+            tags_str = ", ".join(sorted(note.tags))
+            print(f"{i+1}. {content_preview}")
+            print(f"   Tags: {tags_str}")
+
+        # Ask user to select a note
         try:
-            note.remove_tag(tag)
-            repo.update(note)
-            Console.success(f"Tag '{tag}' removed successfully!")
+            choice = int(Console.prompt("Select note number (0 to cancel)"))
+            if choice == 0:
+                return
+            if choice < 1 or choice > len(notes_with_tags):
+                Console.error("Invalid selection")
+                return
+            selected_note = notes_with_tags[choice - 1]
+        except ValueError:
+            Console.error("Invalid input")
+            return
+
+        # Show tags on the selected note
+        tags = sorted(selected_note.tags)
+        Console.info("\nTags on selected note:")
+        for i, tag in enumerate(tags):
+            print(f"{i+1}. {tag}")
+
+        # Ask user to select a tag to remove
+        try:
+            tag_choice = int(Console.prompt("Select tag number to remove (0 to cancel)"))
+            if tag_choice == 0:
+                return
+            if tag_choice < 1 or tag_choice > len(tags):
+                Console.error("Invalid selection")
+                return
+            tag_to_remove = tags[tag_choice - 1]
+        except ValueError:
+            Console.error("Invalid input")
+            return
+
+        # Remove the tag
+        try:
+            selected_note.remove_tag(tag_to_remove)
+            repo.update(selected_note)
+            Console.success(f"Tag '{tag_to_remove}' removed successfully!")
         except Exception as e:
             Console.error(f"Failed to remove tag: {str(e)}")
 
@@ -123,10 +183,7 @@ class NotesByTagCommand(BaseCommand):
             Console.header(f"Tag: {tag} ({len(notes)} notes)")
             for note in notes:
                 content_preview = note.content[:80] + "..." if len(note.content) > 80 else note.content
-                created = note.created_at.strftime("%Y-%m-%d %H:%M")
                 print(f"  • {content_preview}")
-                print(f"    Created: {created}")
-                print()
 
 
 class CleanTagsCommand(BaseCommand):
