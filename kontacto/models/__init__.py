@@ -4,4 +4,4 @@ from .base import BaseModel
 from .contact import Contact
 from .note import Note
 
-__all__ = ['BaseModel', 'Contact', 'Note']
+__all__ = ["BaseModel", "Contact", "Note"]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kontacto"
-version = "1.0.0"
+version = "1.0.1"
 description = "A command-line assistant for managing contacts and notes"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = "^3.9"
 colorama = "^0.4.6"
 tabulate = "^0.9.0"
 prompt-toolkit = "^3.0.43"
@@ -22,6 +22,9 @@ pytest-cov = "^4.1.0"
 black = "^23.12.1"
 flake8 = "^6.1.0"
 mypy = "^1.8.0"
+isort = "^5.12.0"
+pre-commit = "^3.6.0"
+codespell = "^2.2.6"
 
 [build-system]
 requires = ["poetry-core"]

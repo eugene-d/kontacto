@@ -1,12 +1,14 @@
 from datetime import datetime
 from typing import Any
-from tabulate import tabulate
+
 from faker import Faker
+from tabulate import tabulate
+
 from ..commands.base_command import BaseCommand
 from ..models.contact import Contact
 from ..repositories.contact_repository import ContactRepository
-from ..utils.validators import parse_date, ValidationError
 from ..ui.console import Console
+from ..utils.validators import ValidationError, parse_date
 
 
 class AddContactCommand(BaseCommand):
@@ -20,7 +22,7 @@ class AddContactCommand(BaseCommand):
         self.usage = "add-contact <name> [address][email][phone][birthday]"
         self.examples = [
             "add-contact 'John' '123 Main St' 'john@example.com' '0501234567' '15.04.1990'",
-            "ac 'Jane Smith'"
+            "ac 'Jane Smith'",
         ]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
@@ -58,7 +60,7 @@ class AddContactCommand(BaseCommand):
         for phone in phones:
             contact.add_phone(phone)
 
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
 
         try:
             repo.add(contact)
@@ -79,7 +81,7 @@ class ListContactsCommand(BaseCommand):
         self.examples = ["list-contacts", "lc"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contacts = repo.get_all()
 
         if not contacts:
@@ -93,13 +95,7 @@ class ListContactsCommand(BaseCommand):
             emails = ", ".join(contact.emails) if contact.emails else "N/A"
             birthday = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
 
-            table_data.append([
-                contact.name,
-                contact.address or "N/A",
-                phones,
-                emails,
-                birthday
-            ])
+            table_data.append([contact.name, contact.address or "N/A", phones, emails, birthday])
 
         headers = ["Name", "Address", "Phones", "Emails", "Birthday"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
@@ -126,7 +122,7 @@ class SearchContactsCommand(BaseCommand):
             return
 
         query = " ".join(args)
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contacts = repo.search(query)
 
         if not contacts:
@@ -139,12 +135,7 @@ class SearchContactsCommand(BaseCommand):
             phones = ", ".join(contact.phones) if contact.phones else "N/A"
             emails = ", ".join(contact.emails) if contact.emails else "N/A"
 
-            table_data.append([
-                contact.name,
-                contact.address or "N/A",
-                phones,
-                emails
-            ])
+            table_data.append([contact.name, contact.address or "N/A", phones, emails])
 
         headers = ["Name", "Address", "Phones", "Emails"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
@@ -165,7 +156,7 @@ class EditContactCommand(BaseCommand):
         self.examples = [
             "edit-contact 'John Doe' address '456 New St'",
             "ec 'Jane Smith' add-phone '555-1234'",
-            "edit-contact 'Bob' birthday '1990-01-15'"
+            "edit-contact 'Bob' birthday '1990-01-15'",
         ]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
@@ -174,7 +165,8 @@ class EditContactCommand(BaseCommand):
             Console.info(self.usage)
             Console.info(
                 "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, "
-                "remove-email, replace-email")
+                "remove-email, replace-email"
+            )
             Console.info("Example: edit-contact 'John' replace-phone '0501234567 0507654321'")
             Console.info("Note: you can edit only one field at a time.")
             return
@@ -183,7 +175,7 @@ class EditContactCommand(BaseCommand):
         field = args[1].lower()
         value = " ".join(args[2:])
 
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contact = repo.get_by_name(name)
 
         if not contact:
@@ -270,7 +262,7 @@ class DeleteContactCommand(BaseCommand):
             return
 
         name = " ".join(args)
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contact = repo.get_by_name(name)
 
         if not contact:
@@ -296,7 +288,6 @@ class UpcomingBirthdaysCommand(BaseCommand):
         self.examples = ["birthdays", "birthdays 30", "bd 7"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-
         if not args:
             Console.error("You must provide the number of days")
             Console.info(self.usage)
@@ -311,7 +302,7 @@ class UpcomingBirthdaysCommand(BaseCommand):
             Console.error("Invalid number of days")
             return
 
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contacts = []
 
         # We iterate over all contacts and select only those whose birthday is in N days
@@ -328,11 +319,13 @@ class UpcomingBirthdaysCommand(BaseCommand):
         table_data = []
         for contact in contacts:
             birthday_str = contact.birthday.strftime("%Y-%m-%d") if contact.birthday else "N/A"
-            table_data.append([
-                contact.name,
-                birthday_str,
-                f"{days} days",
-            ])
+            table_data.append(
+                [
+                    contact.name,
+                    birthday_str,
+                    f"{days} days",
+                ]
+            )
 
         headers = ["Name", "Birthday", "Days Until"]
         table = tabulate(table_data, headers=headers, tablefmt="grid")
@@ -365,17 +358,14 @@ class GenerateContactsCommand(BaseCommand):
                 Console.error("Invalid count")
                 return
 
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         fake = Faker()
 
         Console.info(f"Generating {count} random contacts...")
 
         try:
             for i in range(count):
-                contact = Contact(
-                    name=fake.name(),
-                    address=fake.address().replace('\n', ', ')
-                )
+                contact = Contact(name=fake.name(), address=fake.address().replace("\n", ", "))
 
                 # Add random phone numbers (1-3)
                 for _ in range(fake.random_int(1, 3)):
@@ -409,6 +399,7 @@ class GenerateContactsCommand(BaseCommand):
 
 class CleanContactsCommand(BaseCommand):
     """Command to delete all contacts from the repository."""
+
     def __init__(self):
         super().__init__()
         self.name = "clean-contacts"
@@ -418,7 +409,7 @@ class CleanContactsCommand(BaseCommand):
         self.examples = ["clean-contacts", "cc"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        repo: ContactRepository = context['contact_repo']
+        repo: ContactRepository = context["contact_repo"]
         contacts = repo.get_all()
         if not contacts:
             Console.info("No contacts to delete.")
@@ -427,9 +418,9 @@ class CleanContactsCommand(BaseCommand):
             Console.info("Operation cancelled.")
             return
         try:
-            repo._notes.clear() if hasattr(repo, '_notes') else None
-            repo._contacts.clear() if hasattr(repo, '_contacts') else None
-            if hasattr(repo, 'save_data'):
+            repo._notes.clear() if hasattr(repo, "_notes") else None
+            repo._contacts.clear() if hasattr(repo, "_contacts") else None
+            if hasattr(repo, "save_data"):
                 repo.save_data([])
             Console.success("All contacts deleted successfully!")
         except Exception as e:
