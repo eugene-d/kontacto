@@ -15,7 +15,6 @@ from .commands.contact_commands import (
     CleanContactsCommand,
     DeleteContactCommand,
     EditContactCommand,
-    GenerateContactsCommand,
     ListContactsCommand,
     SearchContactsCommand,
     UpcomingBirthdaysCommand,
@@ -25,7 +24,6 @@ from .commands.note_commands import (
     CleanNotesCommand,
     DeleteNoteCommand,
     EditNoteCommand,
-    GenerateNotesCommand,
     ListNotesCommand,
     SearchByTagCommand,
     SearchNotesCommand,
@@ -100,7 +98,6 @@ class Kontacto:
         self.command_registry.register(EditContactCommand())
         self.command_registry.register(DeleteContactCommand())
         self.command_registry.register(UpcomingBirthdaysCommand())
-        self.command_registry.register(GenerateContactsCommand())
         self.command_registry.register(CleanContactsCommand())
 
         # Note commands
@@ -110,7 +107,6 @@ class Kontacto:
         self.command_registry.register(SearchByTagCommand())
         self.command_registry.register(EditNoteCommand())
         self.command_registry.register(DeleteNoteCommand())
-        self.command_registry.register(GenerateNotesCommand())
         self.command_registry.register(CleanNotesCommand())
 
         # Tag commands
