@@ -143,7 +143,7 @@ class TestIntegration:
         """Test complete contact management workflow."""
         # Add a contact
         with patch("builtins.print") as mock_print:
-            app.process_command('add-contact "John Doe" "123 Main St"')
+            app.process_command('add-contact "John Doe" --address="123 Main St"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
@@ -225,7 +225,7 @@ class TestIntegration:
         """Test that command aliases work in practice."""
         # Test contact aliases
         with patch("builtins.print") as mock_print:
-            app.process_command('ac "Jane Smith" "456 Oak Ave"')
+            app.process_command('ac "Jane Smith" --address="456 Oak Ave"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
@@ -291,13 +291,13 @@ class TestIntegration:
         with patch("builtins.print") as mock_print:
             app.process_command('edit-contact "Nonexistent" name "New Name"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
-            assert "not found" in output
+            assert "No contacts found matching" in output
 
     def test_mixed_workflow(self, app):
         """Test mixed contact and note operations."""
         # Add a contact and a note
         with patch("builtins.print") as mock_print:
-            app.process_command('add-contact "Business Partner" "789 Corp Ave"')
+            app.process_command('add-contact "Business Partner" --address="789 Corp Ave"')
             app.process_command('add-note "Call business partner about project" work important')
 
             # List both
@@ -314,7 +314,7 @@ class TestIntegration:
         """Test edge cases in command parsing."""
         # Quoted arguments with spaces
         with patch("builtins.print") as mock_print:
-            app.process_command('add-contact "John Q. Public" "123 Main Street, Apt 4B"')
+            app.process_command('add-contact "John Q. Public" --address="123 Main Street, Apt 4B"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
@@ -330,7 +330,7 @@ class TestIntegration:
 
         # Test with invalid email format
         with patch("builtins.print") as mock_print:
-            app.process_command('add-contact "Test User" "123 Main St"')
+            app.process_command('add-contact "Test User" --address="123 Main St"')
             app.process_command('edit-contact "Test User" add-email "invalid-email"')
             output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             # Should handle validation error gracefully
@@ -344,7 +344,7 @@ class TestIntegration:
 
         # Add data
         with patch("builtins.print") as mock_print:
-            app.process_command('add-contact "Persistent User" "456 Oak St"')
+            app.process_command('add-contact "Persistent User" --address="456 Oak St"')
             app.process_command('add-note "Persistent note" test')
 
             # Verify data exists

@@ -1,10 +1,11 @@
-.PHONY: help lint format check spell-check test install clean pre-commit setup status
+.PHONY:  help install uninstall setup status lint format check spell-check test clean pre-commit
 
 help:
 	@echo "Available commands:"
 	@echo "  setup       - Complete environment setup (check Poetry, create venv, install deps)"
 	@echo "  status      - Check environment status and requirements"
-	@echo "  install     - Install dependencies and pre-commit hooks"
+	@echo "  install     - Install kontacto CLI command system-wide"
+	@echo "  uninstall   - Uninstall kontacto CLI command"
 	@echo "  format      - Format code with black and isort"
 	@echo "  lint        - Run all linting checks (including spell check)"
 	@echo "  check       - Run format check without making changes"
@@ -45,8 +46,23 @@ status:
 	@echo "💡 To fix any issues, run: make setup"
 
 install:
-	poetry install
-	poetry run pre-commit install
+	@echo "📦 Installing Kontacto CLI..."
+	@echo "🔧 Building package..."
+	@poetry build
+	@echo "⚡ Installing CLI command..."
+	@pip install --user --force-reinstall dist/*.whl
+	@echo "🎉 Installation complete!"
+	@echo ""
+	@echo "✅ You can now run 'kontacto' from anywhere!"
+	@echo "💡 If 'kontacto' is not found, add ~/.local/bin to your PATH:"
+	@echo "   export PATH=\"$$HOME/.local/bin:$$PATH\""
+	@echo "   echo 'export PATH=\"$$HOME/.local/bin:$$PATH\"' >> ~/.zshrc"
+
+uninstall:
+	@echo "🗑️  Uninstalling Kontacto CLI..."
+	@pip uninstall -y kontacto 2>/dev/null || echo "⚠️  Kontacto was not installed"
+	@rm -rf dist/ 2>/dev/null || true
+	@echo "✅ Uninstallation complete!"
 
 format:
 	poetry run black --config black.toml kontacto/ tests/
@@ -81,3 +97,4 @@ clean:
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	rm -rf dist/ build/ *.egg-info/ .venv/

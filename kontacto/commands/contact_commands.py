@@ -19,10 +19,11 @@ class AddContactCommand(BaseCommand):
         self.name = "add-contact"
         self.aliases = ["ac", "new-contact"]
         self.description = "Add a new contact"
-        self.usage = "add-contact <name> [address][email][phone][birthday]"
+        self.usage = "add-contact <name> [--address=<address>] [--email=<email>] [--phone=<phone>] [--birthday=<date>]"
         self.examples = [
-            "add-contact 'John' '123 Main St' 'john@example.com' '0501234567' '15.04.1990'",
-            "ac 'Jane Smith'",
+            "add-contact John --address='123 Main St' --email=john@example.com --phone=0501234567 --birthday=15.04.1990",
+            "ac 'Jane Smith' --phone=0501234567",
+            "add-contact John --addr='123 Main St' --bday=15.04.1990",
         ]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
@@ -31,28 +32,19 @@ class AddContactCommand(BaseCommand):
             Console.info(self.usage)
             return
 
+        # Parse arguments: first arg is name, rest are flags
         name = args[0]
-        address_parts = []
-        emails = []
-        phones = []
-        birthday = None
+        parsed_args = self._parse_flags(args[1:])
 
-        for value in args[1:]:
-            try:
-                parsed_date = datetime.strptime(value, "%d.%m.%Y").date()
-                birthday = parsed_date
-                continue
-            except ValueError:
-                pass
+        if parsed_args is None:
+            return  # Error already displayed
 
-            if "@" in value:
-                emails.append(value)
-            elif value.replace(".", "").isdigit() and len(value) >= 10:
-                phones.append(value)
-            else:
-                address_parts.append(value)
+        # Extract values from parsed flags
+        address = parsed_args.get("address", "")
+        emails = parsed_args.get("emails", [])
+        phones = parsed_args.get("phones", [])
+        birthday = parsed_args.get("birthday")
 
-        address = " ".join(address_parts).strip()
         contact = Contact(name=name, address=address, birthday=birthday)
 
         for email in emails:
@@ -67,6 +59,63 @@ class AddContactCommand(BaseCommand):
             Console.success(f"Contact '{name}' added successfully!")
         except Exception as e:
             Console.error(f"Failed to add contact: {str(e)}")
+
+    def _parse_flags(self, args: list[str]) -> dict[str, Any] | None:
+        """Parse command line flags into a dictionary of values."""
+        result = {"address": "", "emails": [], "phones": [], "birthday": None}
+
+        # Flag aliases
+        aliases = {"addr": "address", "bday": "birthday", "bd": "birthday"}
+
+        i = 0
+        while i < len(args):
+            arg = args[i]
+
+            if not arg.startswith("--"):
+                Console.error(f"Invalid argument: {arg}")
+                Console.info("All arguments after name must be flags starting with --")
+                Console.info(self.usage)
+                return None
+
+            # Parse flag
+            if "=" in arg:
+                # Format: --flag=value
+                flag_part, value = arg[2:].split("=", 1)
+                i += 1
+            else:
+                # Format: --flag value
+                flag_part = arg[2:]
+                if i + 1 >= len(args):
+                    Console.error(f"Flag --{flag_part} requires a value")
+                    Console.info(self.usage)
+                    return None
+                value = args[i + 1]
+                i += 2
+
+            # Resolve aliases
+            flag_name = aliases.get(flag_part, flag_part)
+
+            # Process flag value
+            if flag_name == "address":
+                result["address"] = value.strip()
+            elif flag_name == "email":
+                result["emails"].append(value.strip())
+            elif flag_name == "phone":
+                result["phones"].append(value.strip())
+            elif flag_name == "birthday":
+                try:
+                    result["birthday"] = datetime.strptime(value.strip(), "%d.%m.%Y").date()
+                except ValueError:
+                    Console.error(f"Invalid birthday format: {value}")
+                    Console.info("Birthday must be in DD.MM.YYYY format")
+                    return None
+            else:
+                Console.error(f"Unknown flag: --{flag_part}")
+                Console.info("Supported flags: --address, --email, --phone, --birthday")
+                Console.info("Short aliases: --addr, --bday, --bd")
+                return None
+
+        return result
 
 
 class ListContactsCommand(BaseCommand):
@@ -145,50 +194,256 @@ class SearchContactsCommand(BaseCommand):
 
 
 class EditContactCommand(BaseCommand):
-    """Command to edit a contact."""
-
     def __init__(self):
         super().__init__()
         self.name = "edit-contact"
         self.aliases = ["ec", "update-contact"]
-        self.description = "Edit an existing contact"
-        self.usage = "edit-contact <name> <field> <value>"
+        self.description = "Edit an existing contact (interactive mode)"
+        self.usage = "edit-contact <name> [field] [value]"
         self.examples = [
-            "edit-contact 'John Doe' address '456 New St'",
-            "ec 'Jane Smith' add-phone '555-1234'",
-            "edit-contact 'Bob' birthday '1990-01-15'",
+            "edit-contact 'John Doe'",  # Interactive mode
+            "edit-contact 'John' address '456 New St'",  # Direct mode
+            "ec 'Jane'",  # Interactive mode with alias
         ]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        if len(args) < 3:
-            Console.error("Name, field, and value are required")
+        if not args:
+            Console.error("Contact name is required")
             Console.info(self.usage)
-            Console.info(
-                "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, "
-                "remove-email, replace-email"
-            )
-            Console.info("Example: edit-contact 'John' replace-phone '0501234567 0507654321'")
-            Console.info("Note: you can edit only one field at a time.")
+            Console.info("💡 Tip: Use interactive mode by just providing the name")
             return
 
         name = args[0]
-        field = args[1].lower()
-        value = " ".join(args[2:])
-
         repo: ContactRepository = context["contact_repo"]
-        contact = repo.get_by_name(name)
 
+        # Find the contact (with fuzzy matching)
+        contact = self._find_contact(name, repo)
         if not contact:
-            Console.error(f"Contact '{name}' not found")
             return
+
+        # If only name provided, use interactive mode
+        if len(args) == 1:
+            self._interactive_edit(contact, repo)
+        else:
+            # Direct mode (backward compatibility)
+            self._direct_edit(contact, args[1:], repo)
+
+    def _find_contact(self, name: str, repo: ContactRepository):
+        """Find contact with fuzzy matching."""
+        # Try exact match first
+        contact = repo.get_by_name(name)
+        if contact:
+            return contact
+
+        # Try fuzzy search
+        matching_contacts = repo.search(name)
+        if not matching_contacts:
+            Console.error(f"No contacts found matching '{name}'")
+            return None
+
+        if len(matching_contacts) == 1:
+            contact = matching_contacts[0]
+            Console.info(f"Found contact: {contact.name}")
+            return contact
+
+        # Multiple matches - let user choose
+        Console.info(f"Found {len(matching_contacts)} contacts matching '{name}':")
+        for i, contact in enumerate(matching_contacts, 1):
+            phones = ", ".join(contact.phones) if contact.phones else "No phones"
+            emails = ", ".join(contact.emails) if contact.emails else "No emails"
+            print(f"  {i}. {contact.name} - {phones} - {emails}")
+
+        try:
+            choice = int(Console.prompt("Select contact number (0 to cancel)"))
+            if choice == 0:
+                Console.info("Edit cancelled")
+                return None
+            if 1 <= choice <= len(matching_contacts):
+                return matching_contacts[choice - 1]
+            else:
+                Console.error("Invalid selection")
+                return None
+        except ValueError:
+            Console.error("Invalid input")
+            return None
+
+    def _interactive_edit(self, contact, repo: ContactRepository):
+        """Interactive editing mode."""
+        Console.info(f"\n📝 Editing contact: {contact.name}")
+        Console.info("=" * 40)
+
+        self._display_contact_info(contact)
+
+        # Show edit options
+        Console.info("\n🔧 What would you like to edit?")
+        options = [
+            ("Name", f"Current: {contact.name}"),
+            ("Address", f"Current: {contact.address or 'Not set'}"),
+            ("Birthday", f"Current: {contact.birthday or 'Not set'}"),
+            ("Add Phone", f"Current phones: {', '.join(contact.phones) if contact.phones else 'None'}"),
+            ("Remove Phone", f"Current phones: {', '.join(contact.phones) if contact.phones else 'None'}"),
+            ("Add Email", f"Current emails: {', '.join(contact.emails) if contact.emails else 'None'}"),
+            ("Remove Email", f"Current emails: {', '.join(contact.emails) if contact.emails else 'None'}"),
+        ]
+
+        for i, (option, current) in enumerate(options, 1):
+            print(f"  {i}. {option:<12} - {current}")
+
+        try:
+            choice = int(Console.prompt("\nSelect option (0 to cancel)"))
+            if choice == 0:
+                Console.info("Edit cancelled")
+                return
+            if not (1 <= choice <= len(options)):
+                Console.error("Invalid selection")
+                return
+
+            self._handle_field_edit(contact, choice, repo)
+
+        except ValueError:
+            Console.error("Invalid input")
+            return
+
+    def _display_contact_info(self, contact):
+        """Display current contact information."""
+        print("\n📋 Contact Information:")
+        print(f"   Name: {contact.name}")
+        print(f"   Address: {contact.address or 'Not set'}")
+        print(f"   Birthday: {contact.birthday or 'Not set'}")
+        print(f"   Phones: {', '.join(contact.phones) if contact.phones else 'None'}")
+        print(f"   Emails: {', '.join(contact.emails) if contact.emails else 'None'}")
+
+    def _handle_field_edit(self, contact, choice: int, repo: ContactRepository):
+        """Handle editing a specific field."""
+        original_name = contact.name
+
+        try:
+            if choice == 1:  # Name
+                new_name = Console.prompt("Enter new name")
+                if new_name.strip():
+                    contact.name = new_name.strip()
+                    Console.success(f"Name updated: {original_name} → {contact.name}")
+                else:
+                    Console.error("Name cannot be empty")
+                    return
+
+            elif choice == 2:  # Address
+                new_address = Console.prompt("Enter new address (or leave empty to clear)")
+                contact.address = new_address.strip()
+                Console.success(f"Address updated to: {contact.address or 'Cleared'}")
+
+            elif choice == 3:  # Birthday
+                birthday_str = Console.prompt("Enter birthday (YYYY-MM-DD, DD/MM/YYYY, etc.)")
+                if birthday_str.strip():
+                    birthday = parse_date(birthday_str.strip())
+                    if birthday:
+                        contact.birthday = birthday
+                        Console.success(f"Birthday updated to: {contact.birthday}")
+                    else:
+                        Console.error("Invalid date format. Please use YYYY-MM-DD, DD/MM/YYYY, etc.")
+                        return
+                else:
+                    contact.birthday = None
+                    Console.success("Birthday cleared")
+
+            elif choice == 4:  # Add Phone
+                phone = Console.prompt("Enter phone number to add")
+                if phone.strip():
+                    contact.add_phone(phone.strip())
+                    Console.success(f"Phone added: {phone}")
+                else:
+                    Console.error("Phone number cannot be empty")
+                    return
+
+            elif choice == 5:  # Remove Phone
+                if not contact.phones:
+                    Console.error("No phones to remove")
+                    return
+
+                Console.info("Current phones:")
+                for i, phone in enumerate(contact.phones, 1):
+                    print(f"  {i}. {phone}")
+
+                try:
+                    phone_choice = int(Console.prompt("Select phone number to remove (0 to cancel)"))
+                    if phone_choice == 0:
+                        Console.info("Remove cancelled")
+                        return
+                    if 1 <= phone_choice <= len(contact.phones):
+                        removed_phone = contact.phones[phone_choice - 1]
+                        contact.remove_phone(removed_phone)
+                        Console.success(f"Phone removed: {removed_phone}")
+                    else:
+                        Console.error("Invalid selection")
+                        return
+                except ValueError:
+                    Console.error("Invalid input")
+                    return
+
+            elif choice == 6:  # Add Email
+                email = Console.prompt("Enter email address to add")
+                if email.strip():
+                    contact.add_email(email.strip())
+                    Console.success(f"Email added: {email}")
+                else:
+                    Console.error("Email address cannot be empty")
+                    return
+
+            elif choice == 7:  # Remove Email
+                if not contact.emails:
+                    Console.error("No emails to remove")
+                    return
+
+                Console.info("Current emails:")
+                for i, email in enumerate(contact.emails, 1):
+                    print(f"  {i}. {email}")
+
+                try:
+                    email_choice = int(Console.prompt("Select email to remove (0 to cancel)"))
+                    if email_choice == 0:
+                        Console.info("Remove cancelled")
+                        return
+                    if 1 <= email_choice <= len(contact.emails):
+                        removed_email = contact.emails[email_choice - 1]
+                        contact.remove_email(removed_email)
+                        Console.success(f"Email removed: {removed_email}")
+                    else:
+                        Console.error("Invalid selection")
+                        return
+                except ValueError:
+                    Console.error("Invalid input")
+                    return
+
+            # Save the changes
+            repo.update(contact)
+            Console.success(f"\n✅ Contact '{contact.name}' updated successfully!")
+
+            # Ask if user wants to make more changes
+            more_changes = Console.prompt("\nMake another change? (y/n)").lower()
+            if more_changes in ["y", "yes"]:
+                self._interactive_edit(contact, repo)
+
+        except ValidationError as e:
+            Console.error(f"Validation error: {str(e)}")
+        except Exception as e:
+            Console.error(f"Failed to update contact: {str(e)}")
+
+    def _direct_edit(self, contact, args: list[str], repo: ContactRepository):
+        """Direct editing mode (backward compatibility)."""
+        if len(args) < 2:
+            Console.error("Field and value are required for direct mode")
+            Console.info("💡 Tip: Use 'edit-contact <name>' for interactive mode")
+            return
+
+        field = args[0].lower()
+        value = " ".join(args[1:])
+        original_name = contact.name
 
         try:
             if field == "name":
                 contact.name = value
-
             elif field == "address":
                 contact.address = value
-
             elif field == "birthday":
                 birthday = parse_date(value)
                 if birthday:
@@ -196,13 +451,10 @@ class EditContactCommand(BaseCommand):
                 else:
                     Console.error("Invalid date format. Use YYYY-MM-DD")
                     return
-
             elif field == "add-phone":
                 contact.add_phone(value)
-
             elif field == "remove-phone":
                 contact.remove_phone(value)
-
             elif field == "replace-phone":
                 old_new = value.split()
                 if len(old_new) != 2:
@@ -211,13 +463,10 @@ class EditContactCommand(BaseCommand):
                 old_phone, new_phone = old_new
                 contact.remove_phone(old_phone)
                 contact.add_phone(new_phone)
-
             elif field == "add-email":
                 contact.add_email(value)
-
             elif field == "remove-email":
                 contact.remove_email(value)
-
             elif field == "replace-email":
                 old_new = value.split()
                 if len(old_new) != 2:
@@ -226,17 +475,16 @@ class EditContactCommand(BaseCommand):
                 old_email, new_email = old_new
                 contact.remove_email(old_email)
                 contact.add_email(new_email)
-
             else:
                 Console.error(f"Unknown field: {field}")
                 Console.info(
-                    "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, "
-                    "remove-email, replace-email "
+                    "Available fields: name, address, birthday, add-phone, remove-phone, replace-phone, add-email, remove-email, replace-email"
                 )
+                Console.info("💡 Tip: Use 'edit-contact <name>' for interactive mode")
                 return
 
             repo.update(contact)
-            Console.success(f"Contact '{name}' updated successfully!")
+            Console.success(f"Contact '{original_name}' updated successfully!")
 
         except ValidationError as e:
             Console.error(f"Validation error: {str(e)}")
