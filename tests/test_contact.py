@@ -1,5 +1,7 @@
-import pytest
 from datetime import date
+
+import pytest
+
 from kontacto.models.contact import Contact
 from kontacto.utils.validators import ValidationError
 

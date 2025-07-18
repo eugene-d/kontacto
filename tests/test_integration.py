@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from kontacto.main import Kontacto
 
@@ -31,8 +32,11 @@ class TestContactRepository:
         results = []
         query_lower = query.lower()
         for contact in self._contacts:
-            if (query_lower in contact.name.lower() or
-                query_lower in contact.address.lower() if contact.address else False):
+            if (
+                query_lower in contact.name.lower() or query_lower in contact.address.lower()
+                if contact.address
+                else False
+            ):
                 results.append(contact)
         return results
 
@@ -130,177 +134,177 @@ class TestIntegration:
     @pytest.fixture
     def app(self):
         """Create app with test repositories."""
-        with patch('kontacto.main.ContactRepository', TestContactRepository):
-            with patch('kontacto.main.NoteRepository', TestNoteRepository):
+        with patch("kontacto.main.ContactRepository", TestContactRepository):
+            with patch("kontacto.main.NoteRepository", TestNoteRepository):
                 app = Kontacto()
                 return app
 
     def test_full_contact_workflow(self, app):
         """Test complete contact management workflow."""
         # Add a contact
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-contact "John Doe" "123 Main St"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
         # List contacts
-        with patch('builtins.print') as mock_print:
-            app.process_command('list-contacts')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("list-contacts")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "John Doe" in output
             assert "123 Main St" in output
 
         # Search for the contact
-        with patch('builtins.print') as mock_print:
-            app.process_command('search-contacts john')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("search-contacts john")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "John Doe" in output
 
         # Edit the contact
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('edit-contact "John Doe" add-phone "555-1234"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "updated successfully" in output
 
         # Verify the edit
-        with patch('builtins.print') as mock_print:
-            app.process_command('list-contacts')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("list-contacts")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "5551234" in output  # Phone numbers are displayed without dashes
 
     def test_full_note_workflow(self, app):
         """Test complete note management workflow."""
         # Add a note
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-note "Buy milk and bread" shopping urgent')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
         # List notes
-        with patch('builtins.print') as mock_print:
-            app.process_command('list-notes')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("list-notes")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Buy milk and bread" in output
             assert "shopping" in output
             assert "urgent" in output
 
         # Search notes
-        with patch('builtins.print') as mock_print:
-            app.process_command('search-notes milk')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("search-notes milk")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Buy milk and bread" in output
 
         # Search by tag
-        with patch('builtins.print') as mock_print:
-            app.process_command('search-tag shopping')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("search-tag shopping")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Buy milk and bread" in output
 
         # Add another note
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-note "Meeting at 3pm" work')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
         # List tags
-        with patch('builtins.print') as mock_print:
-            app.process_command('list-tags')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("list-tags")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "shopping" in output
             assert "urgent" in output
             assert "work" in output
 
         # Group notes by tags
-        with patch('builtins.print') as mock_print:
-            app.process_command('notes-by-tag')
-            output = ' '.join(str(call[0][0]) if call[0] else str(call) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("notes-by-tag")
+            output = " ".join(str(call[0][0]) if call[0] else str(call) for call in mock_print.call_args_list)
             assert "shopping" in output
             assert "work" in output
 
     def test_command_aliases(self, app):
         """Test that command aliases work in practice."""
         # Test contact aliases
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('ac "Jane Smith" "456 Oak Ave"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
-        with patch('builtins.print') as mock_print:
-            app.process_command('lc')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("lc")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Jane Smith" in output
 
-        with patch('builtins.print') as mock_print:
-            app.process_command('sc jane')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("sc jane")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Jane Smith" in output
 
         # Test note aliases
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('an "Test note" test')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
-        with patch('builtins.print') as mock_print:
-            app.process_command('ln')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("ln")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Test note" in output
 
     def test_help_system(self, app):
         """Test the help system integration."""
         # Test general help
-        with patch('builtins.print') as mock_print:
-            app.process_command('help')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("help")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Available Commands" in output
             assert "Contact Commands" in output
             assert "Note Commands" in output
 
         # Test help with alias
-        with patch('builtins.print') as mock_print:
-            app.process_command('h')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("h")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Available Commands" in output
 
         # Test specific command help
-        with patch('builtins.print') as mock_print:
-            app.process_command('help add-contact')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("help add-contact")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "add-contact" in output
             assert "Add a new contact" in output
 
     def test_error_handling_integration(self, app):
         """Test error handling in real scenarios."""
         # Unknown command
-        with patch('builtins.print') as mock_print:
-            app.process_command('unknown-command')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("unknown-command")
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Unknown command" in output
 
         # Invalid arguments
-        with patch('builtins.print') as mock_print:
-            app.process_command('add-contact')  # Missing name
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+        with patch("builtins.print") as mock_print:
+            app.process_command("add-contact")  # Missing name
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Name is required" in output
 
         # Contact not found
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('edit-contact "Nonexistent" name "New Name"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "not found" in output
 
     def test_mixed_workflow(self, app):
         """Test mixed contact and note operations."""
         # Add a contact and a note
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-contact "Business Partner" "789 Corp Ave"')
             app.process_command('add-note "Call business partner about project" work important')
 
             # List both
-            app.process_command('list-contacts')
-            app.process_command('list-notes')
+            app.process_command("list-contacts")
+            app.process_command("list-notes")
 
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Business Partner" in output
             assert "Call business partner" in output
             assert "work" in output
@@ -309,15 +313,15 @@ class TestIntegration:
     def test_command_parsing_edge_cases(self, app):
         """Test edge cases in command parsing."""
         # Quoted arguments with spaces
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-contact "John Q. Public" "123 Main Street, Apt 4B"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
         # Multiple tags
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-note "Complex note" tag1 tag2 tag3')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "added successfully" in output
 
     def test_validation_integration(self, app):
@@ -325,10 +329,10 @@ class TestIntegration:
         from kontacto.utils.validators import ValidationError
 
         # Test with invalid email format
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-contact "Test User" "123 Main St"')
             app.process_command('edit-contact "Test User" add-email "invalid-email"')
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             # Should handle validation error gracefully
             assert "Error" in output or "Invalid" in output
 
@@ -339,7 +343,7 @@ class TestIntegration:
         from kontacto.repositories.note_repository import NoteRepository
 
         # Add data
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             app.process_command('add-contact "Persistent User" "456 Oak St"')
             app.process_command('add-note "Persistent note" test')
 
@@ -348,18 +352,18 @@ class TestIntegration:
             assert len(app.note_repo.get_all()) == 1
 
             # Verify we can retrieve it
-            app.process_command('list-contacts')
-            app.process_command('list-notes')
+            app.process_command("list-contacts")
+            app.process_command("list-notes")
 
-            output = ' '.join(str(call[0][0]) for call in mock_print.call_args_list)
+            output = " ".join(str(call[0][0]) for call in mock_print.call_args_list)
             assert "Persistent User" in output
             assert "Persistent note" in output
 
     @pytest.fixture
     def app_with_real_repos(self):
         """Create app with real repositories for testing."""
-        with patch('kontacto.main.ContactRepository'):
-            with patch('kontacto.main.NoteRepository'):
+        with patch("kontacto.main.ContactRepository"):
+            with patch("kontacto.main.NoteRepository"):
                 return Kontacto()
 
     def test_app_initialization_with_real_repos(self, app_with_real_repos):
@@ -371,6 +375,6 @@ class TestIntegration:
         assert app_with_real_repos.context is not None
 
         # Test that context is set up correctly
-        assert 'contact_repo' in app_with_real_repos.context
-        assert 'note_repo' in app_with_real_repos.context
-        assert 'kontacto' in app_with_real_repos.context
+        assert "contact_repo" in app_with_real_repos.context
+        assert "note_repo" in app_with_real_repos.context
+        assert "kontacto" in app_with_real_repos.context

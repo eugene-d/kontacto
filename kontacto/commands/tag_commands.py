@@ -1,11 +1,15 @@
 from typing import Any
+
 from tabulate import tabulate
+
 from ..commands.base_command import BaseCommand
 from ..repositories.note_repository import NoteRepository
 from ..ui.console import Console
 
+
 class AddTagCommand(BaseCommand):
     """Command to add tag to a note."""
+
     def __init__(self):
         super().__init__()
         self.name = "add-tag"
@@ -21,7 +25,7 @@ class AddTagCommand(BaseCommand):
             return
         search_query = args[0]
         tag = args[1]
-        repo: NoteRepository = context['note_repo']
+        repo: NoteRepository = context["note_repo"]
         notes = repo.search(search_query)
         if not notes:
             Console.error(f"No notes found matching '{search_query}'")
@@ -36,8 +40,10 @@ class AddTagCommand(BaseCommand):
         except Exception as e:
             Console.error(f"Failed to add tag: {str(e)}")
 
+
 class RemoveTagCommand(BaseCommand):
     """Command to remove tag from a note."""
+
     def __init__(self):
         super().__init__()
         self.name = "remove-tag"
@@ -53,7 +59,7 @@ class RemoveTagCommand(BaseCommand):
             return
         search_query = args[0]
         tag = args[1]
-        repo: NoteRepository = context['note_repo']
+        repo: NoteRepository = context["note_repo"]
         notes = repo.search(search_query)
         if not notes:
             Console.error(f"No notes found matching '{search_query}'")
@@ -68,8 +74,10 @@ class RemoveTagCommand(BaseCommand):
         except Exception as e:
             Console.error(f"Failed to remove tag: {str(e)}")
 
+
 class ListTagsCommand(BaseCommand):
     """Command to list all tags."""
+
     def __init__(self):
         super().__init__()
         self.name = "list-tags"
@@ -79,7 +87,7 @@ class ListTagsCommand(BaseCommand):
         self.examples = ["list-tags", "lt"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        repo: NoteRepository = context['note_repo']
+        repo: NoteRepository = context["note_repo"]
         tags = repo.get_all_tags()
         if not tags:
             Console.info("No tags found")
@@ -93,8 +101,10 @@ class ListTagsCommand(BaseCommand):
         Console.info(f"\nTotal tags: {len(tags)}")
         print(table)
 
+
 class NotesByTagCommand(BaseCommand):
     """Command to show notes grouped by tags."""
+
     def __init__(self):
         super().__init__()
         self.name = "notes-by-tag"
@@ -104,7 +114,7 @@ class NotesByTagCommand(BaseCommand):
         self.examples = ["notes-by-tag", "nbt"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        repo: NoteRepository = context['note_repo']
+        repo: NoteRepository = context["note_repo"]
         grouped = repo.get_notes_by_tags()
         if not grouped:
             Console.info("No tagged notes found")
@@ -118,8 +128,10 @@ class NotesByTagCommand(BaseCommand):
                 print(f"    Created: {created}")
                 print()
 
+
 class CleanTagsCommand(BaseCommand):
     """Command to remove all tags from every note, keeping the notes themselves."""
+
     def __init__(self):
         super().__init__()
         self.name = "clean-tags"
@@ -129,7 +141,7 @@ class CleanTagsCommand(BaseCommand):
         self.examples = ["clean-tags", "ct"]
 
     def execute(self, args: list[str], context: dict[str, Any]) -> None:
-        repo: NoteRepository = context['note_repo']
+        repo: NoteRepository = context["note_repo"]
         notes = repo.get_all()
         if not notes:
             Console.info("No notes found.")
@@ -139,8 +151,8 @@ class CleanTagsCommand(BaseCommand):
             return
         try:
             for note in notes:
-                note._tags.clear() if hasattr(note, '_tags') else None
+                note._tags.clear() if hasattr(note, "_tags") else None
                 repo.update(note)
             Console.success("All tags removed from all notes!")
         except Exception as e:
-            Console.error(f"Failed to remove all tags: {str(e)}") 
+            Console.error(f"Failed to remove all tags: {str(e)}")

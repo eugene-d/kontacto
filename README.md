@@ -1,6 +1,6 @@
 # Kontacto
 
-A command-line Kontacto application for managing contacts and notes with intelligent command recognition.
+A command-line application for managing contacts and notes with intelligent command recognition.
 
 ## Features
 
@@ -28,10 +28,16 @@ A command-line Kontacto application for managing contacts and notes with intelli
 - Data persists between application restarts
 - Files are stored in the project root directory
 
+### Development Tools
+- Comprehensive code quality tools (Black, isort, flake8, mypy, codespell)
+- Pre-commit hooks for automated code quality checks
+- Makefile with convenient development commands
+- Dedicated configuration files for each tool
+
 ## Installation
 
 ### Prerequisites
-- Python 3.8.1 or higher
+- Python 3.9 or higher
 - Poetry (dependency management)
 
 ### Installing Poetry
@@ -51,12 +57,19 @@ git clone <repository-url>
 cd kontacto
 ```
 
-2. Install dependencies with Poetry:
+2. Install dependencies and set up development tools:
 ```bash
+# Complete environment setup (recommended for first-time setup)
+make setup
+
+# Or just install dependencies if you already have Poetry set up
+make install
+
+# Or manually with Poetry:
 poetry install
 ```
 
-For development (includes testing tools):
+For development (includes testing and linting tools):
 ```bash
 poetry install --with dev
 ```
@@ -211,12 +224,22 @@ The application includes comprehensive error handling:
 ### Project Structure
 ```
 kontacto/
-├── models/           # Data models (Contact, Note)
-├── commands/         # Command implementations
-├── repositories/     # Data persistence layer
-├── ui/              # User interface utilities
-├── utils/           # Helper utilities
-└── main.py          # Application entry point
+├── kontacto/
+│   ├── models/           # Data models (Contact, Note)
+│   ├── commands/         # Command implementations
+│   ├── repositories/     # Data persistence layer
+│   ├── ui/              # User interface utilities
+│   ├── utils/           # Helper utilities
+│   └── main.py          # Application entry point
+├── tests/               # Test files
+├── .flake8             # Flake8 linter configuration
+├── .isort.cfg          # Import sorting configuration
+├── black.toml          # Code formatting configuration
+├── mypy.ini            # Type checking configuration
+├── .codespellrc        # Spell checking configuration
+├── .pre-commit-config.yaml # Pre-commit hooks configuration
+├── Makefile            # Development commands
+└── pyproject.toml      # Poetry project configuration
 ```
 
 ### Design Patterns Used
@@ -225,10 +248,71 @@ kontacto/
 - **Factory Pattern**: For creating model instances
 - **Observer Pattern**: For event notifications
 
+#### Development Commands
+
+Use the Makefile for convenient development tasks:
+
+```bash
+# Complete environment setup (check Poetry, create venv, install deps)
+make setup
+
+# Check environment status and requirements
+make status
+
+# Install dependencies and set up pre-commit hooks
+make install
+
+# Format code (black + isort)
+make format
+
+# Run all linting checks
+make lint
+
+# Run format and lint checks without making changes
+make check
+
+# Run spell check and fix issues
+make spell-check
+
+# Run tests
+make test
+
+# Set up pre-commit hooks
+make pre-commit
+
+# Clean up cache files
+make clean
+
+# Show all available commands
+make help
+```
+
+#### Pre-commit Hooks
+
+The project uses pre-commit hooks to automatically run code quality checks:
+
+```bash
+# Install pre-commit hooks (done automatically with 'make install')
+poetry run pre-commit install
+
+# Run pre-commit hooks on all files
+poetry run pre-commit run --all-files
+```
+
+#### Configuration Files
+
+- `.flake8` - Flake8 linter settings
+- `.isort.cfg` - Import sorting settings
+- `black.toml` - Code formatting settings
+- `mypy.ini` - Type checking settings
+- `.codespellrc` - Spell checking settings
+
 ### Running Tests
 
 ```bash
 # Run all tests
+make test
+# or
 poetry run pytest
 
 # Run with verbose output
@@ -236,6 +320,40 @@ poetry run pytest -v
 
 # Run with coverage report
 poetry run pytest --cov=kontacto --cov-report=term-missing
+```
+
+### Code Quality Workflow
+
+1. **Before committing**: Run `make lint` to check code quality
+2. **Auto-format**: Run `make format` to format code
+3. **Pre-commit**: Hooks will automatically run on commit
+4. **Spell check**: Run `make spell-check` to fix typos
+
+### Development Setup
+
+```bash
+# Clone and set up the project
+git clone <repository-url>
+cd kontacto
+
+# Complete environment setup (recommended for first-time setup)
+make setup
+
+# Check environment status anytime
+make status
+
+# Make changes to code...
+
+# Format and check code quality
+make format
+make lint
+
+# Run tests
+make test
+
+# Commit changes (pre-commit hooks will run automatically)
+git add .
+git commit -m "Your commit message"
 ```
 
 ## Troubleshooting
@@ -256,7 +374,7 @@ poetry run pytest --cov=kontacto --cov-report=term-missing
    - Use `poetry run` to execute commands in the virtual environment
 
 4. **Python version errors**
-   - Ensure you have Python 3.8.1 or higher: `python3 --version`
+   - Ensure you have Python 3.9 or higher: `python3 --version`
    - Poetry will automatically use the correct Python version
 
 ## Contributing

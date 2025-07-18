@@ -1,4 +1,5 @@
 import pytest
+
 from kontacto.models.note import Note
 from kontacto.utils.validators import ValidationError
 

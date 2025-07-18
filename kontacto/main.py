@@ -1,30 +1,38 @@
 import sys
 from typing import Any
+
+from colorama import init as init_colorama
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import CompleteStyle
-from colorama import init as init_colorama
 
 from .commands.base_command import CommandRegistry
 from .commands.contact_commands import (
-    AddContactCommand, ListContactsCommand, SearchContactsCommand,
-    EditContactCommand, DeleteContactCommand, UpcomingBirthdaysCommand,
-    GenerateContactsCommand, CleanContactsCommand
+    AddContactCommand,
+    CleanContactsCommand,
+    DeleteContactCommand,
+    EditContactCommand,
+    GenerateContactsCommand,
+    ListContactsCommand,
+    SearchContactsCommand,
+    UpcomingBirthdaysCommand,
 )
 from .commands.note_commands import (
-    AddNoteCommand, ListNotesCommand, SearchNotesCommand,
-    SearchByTagCommand, EditNoteCommand, DeleteNoteCommand,
-    GenerateNotesCommand, CleanNotesCommand
+    AddNoteCommand,
+    CleanNotesCommand,
+    DeleteNoteCommand,
+    EditNoteCommand,
+    GenerateNotesCommand,
+    ListNotesCommand,
+    SearchByTagCommand,
+    SearchNotesCommand,
 )
-from .commands.tag_commands import (
-    AddTagCommand, RemoveTagCommand, ListTagsCommand,
-    NotesByTagCommand, CleanTagsCommand
-)
+from .commands.tag_commands import AddTagCommand, CleanTagsCommand, ListTagsCommand, NotesByTagCommand, RemoveTagCommand
 from .repositories.contact_repository import ContactRepository
 from .repositories.note_repository import NoteRepository
-from .ui.console import Console
 from .ui.command_completer import CommandCompleter
-from .utils.fuzzy_matcher import parse_command_input, find_best_match
+from .ui.console import Console
+from .utils.fuzzy_matcher import find_best_match, parse_command_input
 
 
 class Kontacto:
@@ -44,9 +52,9 @@ class Kontacto:
         self.completer = CommandCompleter(self.command_registry.get_command_names())
 
         self.context: dict[str, Any] = {
-            'contact_repo': self.contact_repo,
-            'note_repo': self.note_repo,
-            'kontacto': self
+            "contact_repo": self.contact_repo,
+            "note_repo": self.note_repo,
+            "kontacto": self,
         }
 
     def _register_commands(self) -> None:
@@ -95,7 +103,7 @@ class Kontacto:
                 self.examples = ["help", "help add-contact", "? search-notes"]
 
             def execute(self, args, context):
-                kontacto = context['kontacto']
+                kontacto = context["kontacto"]
 
                 if args:
                     # Show help for specific command
@@ -106,10 +114,7 @@ class Kontacto:
                         print(command.get_help())
                     else:
                         Console.error(f"Unknown command: {command_name}")
-                        suggestions = find_best_match(
-                            command_name,
-                            kontacto.command_registry.get_command_names()
-                        )
+                        suggestions = find_best_match(command_name, kontacto.command_registry.get_command_names())
                         if suggestions:
                             Console.info(f"Did you mean: {suggestions}?")
                 else:
@@ -125,12 +130,11 @@ class Kontacto:
                     other_commands = []
 
                     for cmd in commands:
-                        if 'contact' in cmd.name:
+                        if "contact" in cmd.name:
                             contact_commands.append(cmd)
-                        elif cmd.name in [
-                            'add-tag', 'remove-tag', 'list-tags', 'notes-by-tag', 'clean-tags']:
+                        elif cmd.name in ["add-tag", "remove-tag", "list-tags", "notes-by-tag", "clean-tags"]:
                             tag_commands.append(cmd)
-                        elif 'note' in cmd.name or 'tag' in cmd.name:
+                        elif "note" in cmd.name or "tag" in cmd.name:
                             note_commands.append(cmd)
                         else:
                             other_commands.append(cmd)
@@ -186,7 +190,8 @@ class Kontacto:
 
             def execute(self, args, context):
                 import os
-                os.system('clear' if os.name == 'posix' else 'cls')
+
+                os.system("clear" if os.name == "posix" else "cls")
 
         self.command_registry.register(HelpCommand())
         self.command_registry.register(ExitCommand())
@@ -248,7 +253,7 @@ class Kontacto:
         Console.info("Use Tab for command completion, arrow keys for history.\n")
 
         # Command history
-        history = FileHistory('.kontacto_history')
+        history = FileHistory(".kontacto_history")
 
         while True:
             try:
@@ -257,7 +262,7 @@ class Kontacto:
                     "kontacto> ",
                     completer=self.completer,
                     complete_style=CompleteStyle.READLINE_LIKE,
-                    history=history
+                    history=history,
                 )
 
                 self.process_command(user_input)

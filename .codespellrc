@@ -1,0 +1,3 @@
+[codespell]
+skip = *.git,*.svg,*.pdf,*.pyc,*.lock,*.po,*.pot,*.mo,*/.mypy_cache/*,*/.pytest_cache/*,*/venv/*,*/.venv/*,*/dist/*,*/build/*
+ignore-words-list = Kontacto,kontacto
